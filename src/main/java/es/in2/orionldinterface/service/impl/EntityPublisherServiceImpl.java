@@ -20,7 +20,7 @@ public class EntityPublisherServiceImpl implements EntityPublisherService {
     public void publishEntity(String entity) {
 
         log.debug("Recieved new entity");
-        log.debug("Uploading new entity...");
+        log.debug("Uploading new entity..");
         applicationUtils.postRequest(contextBrokerConfigApi.getEntitiesUrl(), entity);
         log.debug("Entity uploaded successfully");
 
