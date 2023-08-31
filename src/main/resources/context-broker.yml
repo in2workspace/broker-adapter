@@ -1,0 +1,16 @@
+# Context Broker configuration file
+api:
+  subscription-url: http://sp-orionld:1027/ngsi-ld/v1/subscriptions #http://localhost:1026/ngsi-ld/v1/subscriptions
+  entities-url: http://sp-orionld:1027/ngsi-ld/v1/entities/
+  access-token: "example-token"
+subscription:
+  name: "default"
+  entities:
+    -
+      type: "ProductOrder"
+    -
+      type: "ProductOffering"
+
+  id-prefix: "urn:ngsi-ld:Subscription:"
+  type: "Subscription"
+  notification-endpoint-uri: http://sp-blockchain-connector-core:8082/notifications
