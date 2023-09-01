@@ -1,10 +1,6 @@
 spring:
   application:
-    name: Blockchain Connector Interface
-  config:
-    import:
-      - classpath:context-broker.yml
-      - file:/src/main/resources/context-broker.yml
+    name: Blockchain Connector Orion I/F
   datasource:
     url: jdbc:h2:mem:dbtest
     driver-class-name: org.h2.Driver
@@ -25,8 +21,8 @@ spring:
       password: in2pass
 logging:
   level:
-    org.springframework.security: INFO
-    es.in2.dome.blockchain.connector: DEBUG
+    org.springframework.security: DEBUG
+    es.es.in2.orionldinterface: DEBUG
 management:
   endpoints:
     enabled-by-default: false
