@@ -64,7 +64,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     private List<SubscriptionDTO> getOrionLdSubscriptions() throws JsonProcessingException {
         // Orion-LD URL
-        String orionLdURL = orionLdproperties.getOrionLdDomain() + orionLdproperties.getOrionLdEntitiesPath();
+        String orionLdURL = orionLdproperties.getOrionLdDomain() + orionLdproperties.getOrionLdSubscriptionsPath();
         log.debug("URL {}", orionLdURL);
         String response = applicationUtils.getRequest(orionLdURL);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -75,7 +75,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     private void createOrionLdSubscription(SubscriptionDTO subscriptionDTO) throws JsonProcessingException {
         // Orion-LD URL
-        String orionLdURL = orionLdproperties.getOrionLdDomain() + orionLdproperties.getOrionLdEntitiesPath();
+        String orionLdURL = orionLdproperties.getOrionLdDomain() + orionLdproperties.getOrionLdSubscriptionsPath();
         log.debug("URL {}", orionLdURL);
         // Parse subscription to JSON String object.
         String requestBody = new ObjectMapper().writeValueAsString(subscriptionDTO);
@@ -86,7 +86,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     private void updateSubscription(SubscriptionDTO subscriptionDTO) throws JsonProcessingException {
-        String orionLdURL = orionLdproperties.getOrionLdDomain() + orionLdproperties.getOrionLdEntitiesPath() + "/" + subscriptionDTO.getId();
+        String orionLdURL = orionLdproperties.getOrionLdDomain() + orionLdproperties.getOrionLdSubscriptionsPath() + "/" + subscriptionDTO.getId();
         log.debug("URL {}", orionLdURL);
 
         String requestBody = new ObjectMapper().writeValueAsString(subscriptionDTO);

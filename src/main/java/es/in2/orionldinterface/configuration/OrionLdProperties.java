@@ -14,4 +14,7 @@ public class OrionLdProperties {
     @Value("${orion-ld-if.orion-ld.path.entities}")
     private String orionLdEntitiesPath;
 
+    @Value("${orion-ld-if.orion-ld.path.subscriptions}")
+    private String orionLdSubscriptionsPath;
+
 }
