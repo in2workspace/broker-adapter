@@ -26,4 +26,14 @@ public class SubscriptionDTO {
     @JsonProperty("notification")
     private NotificationDTO notification;
 
+    @Override
+    public String toString() {
+        return "SubscriptionDTO {" +
+                "id " + id +
+                ", type = " + type +
+                ", entityList = " + entityList +
+                ", notification = " + notification +
+                '}';
+    }
+
 }

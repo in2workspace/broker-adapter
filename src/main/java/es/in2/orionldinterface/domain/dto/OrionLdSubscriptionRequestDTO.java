@@ -29,7 +29,3 @@ public class OrionLdSubscriptionRequestDTO {
     private List<String> entities;
 
 }
-
-/*
-
- */

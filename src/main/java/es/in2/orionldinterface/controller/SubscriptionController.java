@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/subscriptions")
 @RequiredArgsConstructor
 public class SubscriptionController {
+
     private final SubscriptionService subscriptionService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    public void makeSubscription(@RequestBody OrionLdSubscriptionRequestDTO orionLdSubscriptionRequestDTO) {
-        subscriptionService.createDefaultSubscription(orionLdSubscriptionRequestDTO);
+    public void createSubscription(@RequestBody OrionLdSubscriptionRequestDTO orionLdSubscriptionRequestDTO) {
+        subscriptionService.createSubscription(orionLdSubscriptionRequestDTO);
     }
+
 }

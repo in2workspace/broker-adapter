@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/interface")
 @RequiredArgsConstructor
-public class EntityPublisherController {
+public class EntityController {
 
     private final EntityPublisherService entityPublisherService;
 
