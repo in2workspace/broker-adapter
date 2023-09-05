@@ -1,6 +1,6 @@
 package es.in2.orionldinterface.service.impl;
 
-import es.in2.orionldinterface.configuration.ContextBrokerConfigApi;
+import es.in2.orionldinterface.configuration.OrionLdProperties;
 import es.in2.orionldinterface.service.EntityPublisherService;
 import es.in2.orionldinterface.utils.ApplicationUtils;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class EntityPublisherServiceImpl implements EntityPublisherService {
 
     private final ApplicationUtils applicationUtils;
-    private final ContextBrokerConfigApi contextBrokerConfigApi;
+    private final OrionLdProperties orionLdProperties;
 
 
     @Override
@@ -21,8 +21,11 @@ public class EntityPublisherServiceImpl implements EntityPublisherService {
 
         log.debug("Recieved new entity");
         log.debug("Uploading new entity..");
-        applicationUtils.postRequest(contextBrokerConfigApi.getEntitiesUrl(), entity);
+        applicationUtils.postRequest(orionLdProperties.getOrionLdDomain()
+                + orionLdProperties.getOrionLdEntitiesPath(), entity);
         log.debug("Entity uploaded successfully");
 
     }
 }
+
+

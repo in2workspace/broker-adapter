@@ -9,19 +9,21 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/publisher")
+@RequestMapping("/interface")
 @RequiredArgsConstructor
 public class EntityPublisherController {
 
     private final EntityPublisherService entityPublisherService;
 
 
-    @PostMapping
+    @PostMapping("/publish")
     @ResponseStatus(HttpStatus.OK)
     public void recieveEvent(@RequestBody String body) {
         log.debug("Entity received: {}", body);
         entityPublisherService.publishEntity(body);
 
     }
+
+
 
 }

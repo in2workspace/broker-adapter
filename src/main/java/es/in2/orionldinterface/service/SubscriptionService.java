@@ -1,10 +1,8 @@
 package es.in2.orionldinterface.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-import java.util.concurrent.ExecutionException;
+import es.in2.orionldinterface.domain.dto.OrionLdSubscriptionRequestDTO;
 
 public interface SubscriptionService {
-    void createDefaultSubscription() throws JsonProcessingException, InterruptedException, ExecutionException;
+    void createDefaultSubscription(OrionLdSubscriptionRequestDTO orionLdSubscriptionRequestDTO);
 }
 

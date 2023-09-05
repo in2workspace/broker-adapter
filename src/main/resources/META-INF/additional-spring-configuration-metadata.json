@@ -2,7 +2,7 @@
   "properties": [
     {
 
-      "name": "api.access-token",
+      "name": "orion-ld-if.orion-ld.domain",
       "type": "java.lang.String",
       "description": " Valid Access Token."
     },

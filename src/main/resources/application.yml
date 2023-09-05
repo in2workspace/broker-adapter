@@ -3,8 +3,8 @@ spring:
     name: Blockchain Connector Interface
   config:
     import:
-      - classpath:context-broker.yml
-      - file:/src/main/resources/context-broker.yml
+      - classpath:orionld-config.yml
+      - file:/src/main/resources/orionld-config.yml
   datasource:
     url: jdbc:h2:mem:dbtest
     driver-class-name: org.h2.Driver
