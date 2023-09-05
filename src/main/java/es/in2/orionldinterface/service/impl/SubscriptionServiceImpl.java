@@ -27,32 +27,28 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     public void createSubscription(OrionLdSubscriptionRequestDTO orionLdSubscriptionRequestDTO) {
 
-        log.debug("Creating Orion-LD subscription...");
+        log.info(">>> Creating new Orion-LD subscription...");
 
         // map Orion-LD subscription request to Orion-LD subscription DTO
         SubscriptionDTO newSubscription = createSubscriptionDTO(orionLdSubscriptionRequestDTO);
-        log.debug("Orion-LD subscription: {}", newSubscription.toString());
+        log.debug(" > Orion-LD subscription: {}", newSubscription.toString());
 
         try {
 
             // get Orion-LD stored subscriptions
             List<SubscriptionDTO> subscriptionList = getOrionLdSubscriptions();
-            log.debug("Orion-LD subscriptions: {}", subscriptionList.toString());
+            log.debug(" > Orion-LD subscriptions: {}", subscriptionList.toString());
 
             // Check if subscription already exists
             boolean subscriptionExists = subscriptionExists(newSubscription, subscriptionList);
-            log.debug("Subscription exists: {}", subscriptionExists);
+            log.debug(" > Subscription exists: {}", subscriptionExists);
 
             // create/update subscription
-            if (subscriptionList.isEmpty()) {
+            if (subscriptionList.isEmpty() || !subscriptionExists) {
                 // create & publish Subscription (POST)
                 createOrionLdSubscription(newSubscription);
-            } else if (subscriptionExists) {
-                // update & publish Subscription (PATCH)
-                updateSubscription(newSubscription);
             } else {
-                // create & publish Subscription (POST)
-                createOrionLdSubscription(newSubscription);
+                log.info(" > Subscription already exists. Does not need to be created.");
             }
 
         } catch (JsonProcessingException e) {
@@ -93,6 +89,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 && Objects.equals(subscription1.getNotification().getEndpointDTO().getUri(), subscription2.getNotification().getEndpointDTO().getUri());
     }
 
+    // TODO: If this comparison is false, probably we need to update the subscription
     private boolean compareEntityLists(List<EntityDTO> list1, List<EntityDTO> list2) {
         // First, ensure that both lists have the same size
         if (list1.size() != list2.size()) {
@@ -110,7 +107,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private List<SubscriptionDTO> getOrionLdSubscriptions() throws JsonProcessingException {
         // Orion-LD URL
         String orionLdURL = orionLdproperties.getOrionLdDomain() + orionLdproperties.getOrionLdSubscriptionsPath();
-        log.debug("Getting Orion-LD subscriptions from: {}", orionLdURL);
+        log.debug(" > Getting Orion-LD subscriptions from: {}", orionLdURL);
         // Get subscriptions from Orion-LD
         String response = applicationUtils.getRequest(orionLdURL);
         // Parse response to SubscriptionDTO list
@@ -121,10 +118,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private void createOrionLdSubscription(SubscriptionDTO subscriptionDTO) throws JsonProcessingException {
         // Orion-LD URL
         String orionLdURL = orionLdproperties.getOrionLdDomain() + orionLdproperties.getOrionLdSubscriptionsPath();
-        log.debug("Posting subscription to Orion-LD: {}", orionLdURL);
+        log.debug(" > Posting subscription to Orion-LD: {}", orionLdURL);
         // Parse subscription to JSON String object.
         String requestBody = new ObjectMapper().writeValueAsString(subscriptionDTO);
-        log.debug("Posting subscription to Orion-LD: {}", requestBody);
+        log.debug(" > Posting subscription to Orion-LD: {}", requestBody);
         // Post subscription to Context Broker
         applicationUtils.postRequest(orionLdURL, requestBody);
     }
