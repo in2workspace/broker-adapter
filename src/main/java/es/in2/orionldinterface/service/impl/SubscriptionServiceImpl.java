@@ -7,14 +7,13 @@ import es.in2.orionldinterface.domain.dto.*;
 import es.in2.orionldinterface.exception.SubscriptionConfigException;
 import es.in2.orionldinterface.service.SubscriptionService;
 import es.in2.orionldinterface.utils.ApplicationUtils;
+import es.in2.orionldinterface.utils.OrionInterfaceUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -25,37 +24,58 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final OrionLdProperties orionLdproperties;
     private final ApplicationUtils applicationUtils;
 
+    @Override
     public void createSubscription(OrionLdSubscriptionRequestDTO orionLdSubscriptionRequestDTO) {
+        log.debug(">>> Creating or updating Orion-LD subscription...");
 
-        log.info(">>> Creating new Orion-LD subscription...");
-
-        // map Orion-LD subscription request to Orion-LD subscription DTO
+        // Map Orion-LD subscription request to Orion-LD subscription DTO
         SubscriptionDTO newSubscription = createSubscriptionDTO(orionLdSubscriptionRequestDTO);
         log.debug(" > Orion-LD subscription: {}", newSubscription.toString());
 
         try {
-
-            // get Orion-LD stored subscriptions
+            // Get Orion-LD stored subscriptions
             List<SubscriptionDTO> subscriptionList = getOrionLdSubscriptions();
             log.debug(" > Orion-LD subscriptions: {}", subscriptionList.toString());
 
-            // Check if subscription already exists
-            boolean subscriptionExists = subscriptionExists(newSubscription, subscriptionList);
-            log.debug(" > Subscription exists: {}", subscriptionExists);
 
-            // create/update subscription
-            if (subscriptionList.isEmpty() || !subscriptionExists) {
-                // create & publish Subscription (POST)
-                createOrionLdSubscription(newSubscription);
+            if (subscriptionExists(newSubscription, subscriptionList)) {
+                // Subscription with the same endpoint and entity list already exists, do nothing
+                log.debug(" > Subscription with the same endpoint and entity list already exists. Does not need to be created or updated.");
             } else {
-                log.info(" > Subscription already exists. Does not need to be created.");
-            }
+                // Check if subscription already exists or needs to be updated
+                boolean createSubscription = true;
+                for (SubscriptionDTO existingSubscription : subscriptionList) {
+                    if (areEndpointsEqual(existingSubscription, newSubscription)) {
+                        // Update subscription if the endpoint is the same but entities are different
+                        log.debug(" > Updating subscription with the same endpoint but different entities.");
+                        updateSubscription(existingSubscription, newSubscription);
+                        createSubscription = false;
+                    } else if (areSubscriptionsEqual(existingSubscription, newSubscription)) {
+                        // Subscription already exists and is identical, no need to create a new one
+                        log.debug(" > Subscription already exists. Does not need to be created.");
+                        createSubscription = false;
+                    }
+                }
 
+                if (createSubscription) {
+                    // Create & publish Subscription (POST)
+                    createOrionLdSubscription(newSubscription);
+                }
+            }
         } catch (JsonProcessingException e) {
+            log.error("Error while handling subscription: {}", e.getMessage());
             throw new SubscriptionConfigException("Error while handling subscription.");
         }
-
     }
+
+
+
+    private boolean areEndpointsEqual(SubscriptionDTO subscription1, SubscriptionDTO subscription2) {
+        return Objects.equals(subscription1.getNotification().getEndpointDTO().getUri(),
+                subscription2.getNotification().getEndpointDTO().getUri());
+    }
+
+
 
     private static SubscriptionDTO createSubscriptionDTO(OrionLdSubscriptionRequestDTO orionLdSubscriptionRequestDTO) {
         List<EntityDTO> entityDTOList = new ArrayList<>();
@@ -63,8 +83,9 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 entityDTOList.add(EntityDTO.builder()
                         .type(item)
                         .build()));
+
         return SubscriptionDTO.builder()
-                .id(orionLdSubscriptionRequestDTO.getId())
+                .id(OrionInterfaceUtils.SUBSCRIPTION_ID_PFIX + RandomStringUtils.randomAlphanumeric(6))
                 .type(orionLdSubscriptionRequestDTO.getType())
                 .entityList(entityDTOList)
                 .notification(
@@ -89,7 +110,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 && Objects.equals(subscription1.getNotification().getEndpointDTO().getUri(), subscription2.getNotification().getEndpointDTO().getUri());
     }
 
-    // TODO: If this comparison is false, probably we need to update the subscription
     private boolean compareEntityLists(List<EntityDTO> list1, List<EntityDTO> list2) {
         // First, ensure that both lists have the same size
         if (list1.size() != list2.size()) {
@@ -126,16 +146,23 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         applicationUtils.postRequest(orionLdURL, requestBody);
     }
 
-    private void updateSubscription(SubscriptionDTO subscriptionDTO) throws JsonProcessingException {
-        // Orion-LD URL
-        String orionLdURL = orionLdproperties.getOrionLdDomain() + orionLdproperties.getOrionLdSubscriptionsPath() + "/" + subscriptionDTO.getId();
+    private void updateSubscription(SubscriptionDTO existingSubscription, SubscriptionDTO newSubscription) throws JsonProcessingException {
+        // Orion-LD URL for updating the existing subscription
+        String orionLdURL = orionLdproperties.getOrionLdDomain() + orionLdproperties.getOrionLdSubscriptionsPath() + "/" + existingSubscription.getId();
         log.debug("Updating subscription in Orion-LD: {}", orionLdURL);
-        // Parse subscription to JSON String object.
-        String requestBody = new ObjectMapper().writeValueAsString(subscriptionDTO);
+
+        // Copy the ID from the existing subscription to the new subscription
+        newSubscription.setId(existingSubscription.getId());
+
+        // Parse the new subscription (with the same ID) to JSON String object for the update
+        String requestBody = new ObjectMapper().writeValueAsString(newSubscription);
         log.debug("Updating subscription in Orion-LD: {}", requestBody);
+
         // Update subscription in Context Broker
         applicationUtils.patchRequest(orionLdURL, requestBody);
         log.debug("Subscription updated successfully");
     }
+
+
 
 }
