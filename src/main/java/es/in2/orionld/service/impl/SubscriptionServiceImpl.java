@@ -2,16 +2,24 @@ package es.in2.orionld.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.in2.orionld.config.ApplicationProperties;
+import es.in2.orionld.config.BrokerProperties;
 import es.in2.orionld.exception.SubscriptionCreationException;
-import es.in2.orionld.model.*;
+import es.in2.orionld.model.SubscriptionDTO;
+import es.in2.orionld.model.SubscriptionEndpointDTO;
+import es.in2.orionld.model.SubscriptionEntityDTO;
+import es.in2.orionld.model.SubscriptionNotificationDTO;
+import es.in2.orionld.model.SubscriptionRequestDTO;
 import es.in2.orionld.service.SubscriptionService;
 import es.in2.orionld.utils.ApplicationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -21,7 +29,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     public static final String SUBSCRIPTION_ID_PREFIX = "urn:ngsi-ld:Subscription:";
 
-    private final ApplicationProperties applicationProperties;
+    private final BrokerProperties brokerProperties;
     private final ApplicationUtils applicationUtils;
 
     @Override
@@ -89,8 +97,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     private List<SubscriptionDTO> getSubscriptions() {
         // Orion-LD URL
-        String orionLdURL = applicationProperties.getOrionLdDomain() +
-                applicationProperties.getOrionLdSubscriptionsPath();
+        String orionLdURL = brokerProperties.domain() +
+                brokerProperties.paths().subscriptions();
         log.debug(" > Getting Orion-LD subscriptions from: {}", orionLdURL);
         // Get subscriptions from Orion-LD
         String response = applicationUtils.getRequest(orionLdURL);
@@ -139,7 +147,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     private void createSubscription(SubscriptionDTO subscriptionDTO) {
         // Orion-LD URL
-        String orionLdURL = applicationProperties.getOrionLdDomain() + applicationProperties.getOrionLdSubscriptionsPath();
+        String orionLdURL = brokerProperties.domain() + brokerProperties.paths().subscriptions();
         log.debug(" > Posting subscription to Orion-LD: {}", orionLdURL);
         // Parse subscription to JSON String object.
         String requestBody;
@@ -156,7 +164,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     private void updateSubscription(SubscriptionDTO existingSubscription, SubscriptionDTO newSubscription) {
         // Orion-LD URL for updating the existing subscription
-        String orionLdURL = applicationProperties.getOrionLdDomain() + applicationProperties.getOrionLdSubscriptionsPath() + "/" + existingSubscription.getId();
+        String orionLdURL = brokerProperties.domain() + brokerProperties.paths().subscriptions() + "/" + existingSubscription.getId();
         log.debug("Updating subscription in Orion-LD: {}", orionLdURL);
         // Copy the ID from the existing subscription to the new subscription
         newSubscription.setId(existingSubscription.getId());

@@ -2,9 +2,11 @@ package es.in2.orionld.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
-
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -12,12 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SubscriptionEndpointDTO {
+public class RetrievalInfoContentTypeDTO {
 
-	@JsonProperty("uri")
-	private String uri;
-
-	@JsonProperty("receiverInfo")
-	private List<RetrievalInfoContentTypeDTO> receiverInfo = List.of(new RetrievalInfoContentTypeDTO());
-
+	@JsonProperty("Content-Type")
+	private String contentType = "application/json";
 }

@@ -6,6 +6,11 @@ import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
 import java.util.Optional;
 
+/**
+ * Configuration of the broker to connect to.
+ * @param domain - address of the broker, can be internal
+ * @param paths - paths to be used with that broker instance
+ */
 @ConfigurationProperties(prefix = "broker")
 public record BrokerProperties(String domain, @NestedConfigurationProperty BrokerPathProperties paths) {
 

@@ -1,6 +1,6 @@
 package es.in2.orionld.service.impl;
 
-import es.in2.orionld.config.ApplicationProperties;
+import es.in2.orionld.config.BrokerProperties;
 import es.in2.orionld.service.PublishService;
 import es.in2.orionld.utils.ApplicationUtils;
 import lombok.RequiredArgsConstructor;
@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service;
 public class PublishServiceImpl implements PublishService {
 
     private final ApplicationUtils applicationUtils;
-    private final ApplicationProperties applicationProperties;
+    private final BrokerProperties brokerProperties;
 
     @Override
     public void publishEntity(String entity) {
         log.debug(">>> Publishing entity...");
-        String orionLdURL = applicationProperties.getOrionLdDomain() + applicationProperties.getOrionLdEntitiesPath();
+        String orionLdURL = brokerProperties.domain() + brokerProperties.paths().entities();
         log.debug(" > Orion-LD URL: {}", orionLdURL);
         log.debug(" > Request body: {}", entity);
         applicationUtils.postRequest(orionLdURL, entity);
