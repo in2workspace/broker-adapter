@@ -1,6 +1,6 @@
 package es.in2.orionld.service.impl;
 
-import es.in2.orionld.config.ApplicationProperties;
+import es.in2.orionld.config.BrokerProperties;
 import es.in2.orionld.service.EntityRetrievalService;
 import es.in2.orionld.utils.ApplicationUtils;
 import lombok.RequiredArgsConstructor;
@@ -12,14 +12,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class EntityRetrievalServiceImpl implements EntityRetrievalService {
 
-    private final ApplicationUtils applicationUtils;
-    private final ApplicationProperties applicationProperties;
+	private final ApplicationUtils applicationUtils;
+	private final BrokerProperties brokerProperties;
 
-    @Override
-    public String getEntity(String entityId) {
-        log.debug(">>> Getting entity with entity id: {}", entityId);
-        String orionLdURL = applicationProperties.getOrionLdDomain() + applicationProperties.getOrionLdEntitiesPath() + "/" + entityId;
-        log.debug(" > Orion-LD URL: {}", orionLdURL);
-        return applicationUtils.getRequest(orionLdURL);
-    }
+	@Override
+	public String getEntity(String entityId) {
+		log.debug(">>> Getting entity with entity id: {}", entityId);
+		String orionLdURL = brokerProperties.domain() + brokerProperties.paths().entities() + "/" + entityId;
+		log.debug(" > Orion-LD URL: {}", orionLdURL);
+		return applicationUtils.getRequest(orionLdURL);
+	}
 }
