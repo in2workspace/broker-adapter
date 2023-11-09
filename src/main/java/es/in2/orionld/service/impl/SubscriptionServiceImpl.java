@@ -146,6 +146,9 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
 
     private void createSubscription(SubscriptionDTO subscriptionDTO) {
+        if(subscriptionDTO.getNotification().getSubscriptionEndpointDTO().getReceiverInfo() == null) {
+            subscriptionDTO.getNotification().getSubscriptionEndpointDTO().setReceiverInfo(new ArrayList<>());
+        }
         // Orion-LD URL
         String orionLdURL = brokerProperties.domain() + brokerProperties.paths().subscriptions();
         log.debug(" > Posting subscription to Orion-LD: {}", orionLdURL);
