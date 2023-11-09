@@ -1,7 +1,0 @@
-# Orion-LD Configuration
-orion-ld-if:
-  orion-ld:
-    domain: http://sp-orionld:1026
-    path:
-      entities: /ngsi-ld/v1/entities
-      subscriptions: /ngsi-ld/v1/subscriptions
