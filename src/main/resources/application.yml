@@ -1,4 +1,6 @@
 # App Configuration
+
+
 broker:
   domain: http://provider-orionld:1026
   paths:
@@ -10,6 +12,10 @@ broker:
 spring:
   application:
     name: Orion-LD Interface
+  config:
+    import:
+      - classpath:application.yml
+      - file:/src/main/resources/application.yml
 
 # Spring Server Configuration
 server:
