@@ -1,4 +1,4 @@
-/*package es.in2.orionld.controller;
+package es.in2.orionld.controller;
 
 import es.in2.orionld.service.EntityRetrievalService;
 import es.in2.orionld.utils.ApplicationUtils;
@@ -45,4 +45,3 @@ class EntitiesControllerTest {
                 .andReturn();
     }
 }
-*/

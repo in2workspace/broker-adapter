@@ -1,5 +1,6 @@
-/*package es.in2.orionld.service.impl;
+package es.in2.orionld.service.impl;
 
+import es.in2.orionld.config.BrokerPathProperties;
 import es.in2.orionld.config.BrokerProperties;
 import es.in2.orionld.utils.ApplicationUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +16,9 @@ class EntityRetrievalServiceImplTest {
 
     @Mock
     private ApplicationUtils applicationUtils;
+
+    @Mock
+    private BrokerPathProperties brokerPathProperties;
 
     @Mock
     private BrokerProperties brokerProperties;
@@ -33,7 +37,12 @@ class EntityRetrievalServiceImplTest {
         String expectedResponse = "Sample entity data";
 
         Mockito.when(brokerProperties.domain()).thenReturn("https://example.com");
-        Mockito.when(brokerProperties.paths().entities()).thenReturn("/api/v1/entities");
+
+        // Check if paths is null, and provide a default value if it is
+        BrokerPathProperties defaultPaths = new BrokerPathProperties("/api/v1/entities", "/api/v1/subscriptions");
+        Mockito.when(brokerProperties.paths()).thenReturn(defaultPaths);
+
+        Mockito.when(brokerPathProperties.entities()).thenReturn("/api/v1/entities");
         Mockito.when(applicationUtils.getRequest("https://example.com/api/v1/entities/urn:ngsi-ld:sample-entity"))
                 .thenReturn(expectedResponse);
 
@@ -41,5 +50,5 @@ class EntityRetrievalServiceImplTest {
 
         assertEquals(expectedResponse, actualResponse);
     }
+
 }
-*/
