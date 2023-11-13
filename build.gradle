@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'es.in2'
-version = '0.0.1-SNAPSHOT'
+version = '1.0.0-SNAPSHOT'
 
 java {
 	sourceCompatibility = '17'
