@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 public class SubscriptionServiceImpl implements SubscriptionService {
 
     public static final String SUBSCRIPTION_ID_PREFIX = "urn:ngsi-ld:Subscription:";
-
     private final BrokerProperties brokerProperties;
     private final ApplicationUtils applicationUtils;
 
@@ -75,9 +74,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         String id = SUBSCRIPTION_ID_PREFIX + UUID.randomUUID();
         // Create SubscriptionEntityDTO list from SubscribeRequestDTO
         List<SubscriptionEntityDTO> subscriptionEntityDTOList = new ArrayList<>();
-        subscriptionRequestDTO.getEntities().forEach(item -> subscriptionEntityDTOList.add(SubscriptionEntityDTO.builder()
-                .type(item)
-                .build()));
+        subscriptionRequestDTO.getEntities().forEach(item -> subscriptionEntityDTOList.add(
+                SubscriptionEntityDTO.builder().type(item).build()));
         // Create SubscriptionEndpointDTO from SubscribeRequestDTO
         SubscriptionEndpointDTO subscriptionEndpointDTO = SubscriptionEndpointDTO.builder()
                 .uri(subscriptionRequestDTO.getNotificationEndpointUri())
@@ -102,6 +100,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         log.debug(" > Getting Orion-LD subscriptions from: {}", orionLdURL);
         // Get subscriptions from Orion-LD
         String response = applicationUtils.getRequest(orionLdURL);
+        log.debug(" > Orion-LD subscriptions: {}", response);
         // Parse subscriptions to SubscriptionDTO list
         try {
             ObjectMapper objectMapper = new ObjectMapper();

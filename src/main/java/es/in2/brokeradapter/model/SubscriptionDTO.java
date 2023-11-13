@@ -6,8 +6,7 @@ import lombok.*;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -25,15 +24,5 @@ public class SubscriptionDTO {
 
     @JsonProperty("notification")
     private SubscriptionNotificationDTO notification;
-
-    @Override
-    public String toString() {
-        return "SubscriptionDTO {" +
-                "id " + id +
-                ", type = " + type +
-                ", entityList = " + entityList +
-                ", notification = " + notification +
-                '}';
-    }
 
 }

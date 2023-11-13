@@ -2,6 +2,10 @@
 spring:
   application:
     name: Broker Adapter
+  config:
+    import:
+      - classpath:external-config.yml
+      - file:/src/main/resources/external-config.yml
 
 # Spring Logging Configuration
 logging:
@@ -42,12 +46,3 @@ springdoc:
 # Spring Server Configuration
 server:
   port: 8080
-
-# Context Broker Configuration
-broker:
-  domain: http://localhost:1026
-
-# Broker Adapter Configuration
-broker-adapter:
-  openapi:
-    url: http://localhost:8080
