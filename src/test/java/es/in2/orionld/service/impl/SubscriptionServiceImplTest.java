@@ -1,4 +1,4 @@
-/*package es.in2.orionld.service.impl;
+package es.in2.orionld.service.impl;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
@@ -49,10 +50,12 @@ class SubscriptionServiceImplTest {
         String json = "{\"id\":\"urn:ngsi-ld:Subscription:123\",\"type\":\"Subscription\",\"notification-endpoint-uri\":\"https://example.com/notify\",\"entities\":[\"urn:ngsi-ld:Entity:456\"]}";
         // Arrange
         SubscriptionRequestDTO subscriptionRequestDTO = createSubscriptionRequestDTO(json);
+        BrokerPathProperties defaultPaths = new BrokerPathProperties("/api/v1/entities", "/api/v1/subscriptions");
+        Mockito.when(brokerProperties.paths()).thenReturn(defaultPaths);
 
         when(applicationUtils.getRequest(any())).thenReturn("[]"); // Simulate no existing subscriptions
         when(brokerProperties.domain()).thenReturn("www.example.com");
-        when(brokerProperties.paths().subscriptions()).thenReturn("/example"); // Simulate paths
+        when(brokerPathProperties.subscriptions()).thenReturn("/example"); // Simulate paths
 
         // Act
         subscriptionService.processSubscriptionRequest(subscriptionRequestDTO);
@@ -68,6 +71,11 @@ class SubscriptionServiceImplTest {
         // Arrange
         SubscriptionRequestDTO subscriptionRequestDTO = createSubscriptionRequestDTO(json);
         List<SubscriptionDTO> existingSubscriptions = createExistingSubscriptions();
+
+        BrokerPathProperties defaultPaths = new BrokerPathProperties("/api/v1/entities", "/api/v1/subscriptions");
+        Mockito.when(brokerProperties.paths()).thenReturn(defaultPaths);
+        when(brokerProperties.domain()).thenReturn("www.example.com");
+        when(brokerPathProperties.subscriptions()).thenReturn("/example"); // Simulate paths
 
         when(applicationUtils.getRequest(any())).thenReturn(convertSubscriptionsToJson(existingSubscriptions));
 
@@ -94,6 +102,11 @@ class SubscriptionServiceImplTest {
         // Arrange
         SubscriptionRequestDTO subscriptionRequestDTO = createSubscriptionRequestDTO(json);
         when(applicationUtils.getRequest(any())).thenReturn("[]"); // Simulate no existing subscriptions
+
+        BrokerPathProperties defaultPaths = new BrokerPathProperties("/api/v1/entities", "/api/v1/subscriptions");
+        Mockito.when(brokerProperties.paths()).thenReturn(defaultPaths);
+        when(brokerProperties.domain()).thenReturn("www.example.com");
+        when(brokerPathProperties.subscriptions()).thenReturn("/example"); // Simulate paths
 
         // Act
         subscriptionService.processSubscriptionRequest(subscriptionRequestDTO);
@@ -125,4 +138,3 @@ class SubscriptionServiceImplTest {
         return "[]";
     }
 }
-*/
