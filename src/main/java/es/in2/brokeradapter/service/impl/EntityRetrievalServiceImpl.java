@@ -18,7 +18,7 @@ public class EntityRetrievalServiceImpl implements EntityRetrievalService {
 	@Override
 	public String getEntity(String entityId) {
 		log.debug(">>> Getting entity with entity id: {}", entityId);
-		String orionLdURL = brokerProperties.domain() + brokerProperties.paths().entities() + "/" + entityId;
+		String orionLdURL = brokerProperties.internalDomain() + brokerProperties.paths().entities() + "/" + entityId;
 		log.debug(" > Orion-LD URL: {}", orionLdURL);
 		return applicationUtils.getRequest(orionLdURL);
 	}

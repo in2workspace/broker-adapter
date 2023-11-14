@@ -21,7 +21,7 @@ public class UpdateServiceImpl implements UpdateService {
     @Override
     public void updateEntity(String entity) {
         log.debug(">>> Updating entity...");
-        String orionLdURL = brokerProperties.domain() + brokerProperties.paths().entities() +  "/" + extractIdFromEntity(entity) + "/attrs";
+        String orionLdURL = brokerProperties.internalDomain() + brokerProperties.paths().entities() +  "/" + extractIdFromEntity(entity) + "/attrs";
         log.debug(" > Orion-LD URL: {}", orionLdURL);
         log.debug(" > Request body: {}", entity);
         applicationUtils.patchRequest(orionLdURL, entity);

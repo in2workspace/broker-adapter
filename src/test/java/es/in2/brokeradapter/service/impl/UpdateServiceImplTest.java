@@ -38,7 +38,7 @@ class UpdateServiceImplTest {
         String entity = "{\"id\":\"urn:ngsi-ld:Entity:123\",\"type\":\"Entity\",\"name\":\"Sample Entity\"}";
         BrokerPathProperties defaultPaths = new BrokerPathProperties("/api/v1/entities", "/api/v1/subscriptions");
         Mockito.when(brokerProperties.paths()).thenReturn(defaultPaths);
-        when(brokerProperties.domain()).thenReturn("www.example.com");
+        when(brokerProperties.internalDomain()).thenReturn("www.example.com");
         Mockito.when(brokerPathProperties.entities()).thenReturn("/api/v1/entities");
         doNothing().when(applicationUtils).patchRequest(any(), any());
 
@@ -46,7 +46,7 @@ class UpdateServiceImplTest {
         updateService.updateEntity(entity);
 
         // Assert
-        verify(brokerProperties, times(1)).domain();
+        verify(brokerProperties, times(1)).internalDomain();
         verify(brokerProperties, times(1)).paths();
     }
 }

@@ -18,7 +18,7 @@ public class PublishServiceImpl implements PublishService {
     @Override
     public void publishEntity(String entity) {
         log.debug(">>> Publishing entity...");
-        String orionLdURL = brokerProperties.domain() + brokerProperties.paths().entities();
+        String orionLdURL = brokerProperties.internalDomain() + brokerProperties.paths().entities();
         log.debug(" > Orion-LD URL: {}", orionLdURL);
         log.debug(" > Request body: {}", entity);
         applicationUtils.postRequest(orionLdURL, entity);

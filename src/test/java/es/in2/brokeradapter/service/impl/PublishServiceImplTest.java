@@ -35,7 +35,7 @@ class PublishServiceImplTest {
     void testPublishEntity() {
         // Arrange
         String entity = "{\"id\":\"urn:ngsi-ld:Entity:123\",\"type\":\"Entity\",\"name\":\"Sample Entity\"}";
-        Mockito.when(brokerProperties.domain()).thenReturn("https://example.com");
+        Mockito.when(brokerProperties.internalDomain()).thenReturn("https://example.com");
 
         // Check if paths is null, and provide a default value if it is
         BrokerPathProperties defaultPaths = new BrokerPathProperties("/api/v1/entities", "/api/v1/subscriptions");
@@ -48,7 +48,7 @@ class PublishServiceImplTest {
         publishService.publishEntity(entity);
 
         // Assert
-        verify(brokerProperties, times(1)).domain();
+        verify(brokerProperties, times(1)).internalDomain();
         verify(applicationUtils, times(1)).postRequest("https://example.com/api/v1/entities", entity);
     }
 }

@@ -1,6 +1,7 @@
 # Context Broker Configuration
 broker:
-  domain: http://localhost:1026
+  externalDomain: https://<domain.org>/orion-ld
+  internalDomain: http://localhost:1026
 
 # Broker Adapter Configuration
 broker-adapter:

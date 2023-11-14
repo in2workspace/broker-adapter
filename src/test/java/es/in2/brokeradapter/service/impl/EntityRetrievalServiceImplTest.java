@@ -36,7 +36,7 @@ class EntityRetrievalServiceImplTest {
         String entityId = "urn:ngsi-ld:sample-entity";
         String expectedResponse = "Sample entity data";
 
-        Mockito.when(brokerProperties.domain()).thenReturn("https://example.com");
+        Mockito.when(brokerProperties.internalDomain()).thenReturn("https://example.com");
 
         // Check if paths is null, and provide a default value if it is
         BrokerPathProperties defaultPaths = new BrokerPathProperties("/api/v1/entities", "/api/v1/subscriptions");

@@ -18,4 +18,5 @@ public class RetrievalInfoContentTypeDTO {
 
 	@JsonProperty("Content-Type")
 	private String contentType = "application/json";
+
 }

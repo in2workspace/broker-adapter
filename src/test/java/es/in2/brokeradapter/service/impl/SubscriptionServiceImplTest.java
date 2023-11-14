@@ -39,7 +39,7 @@ class SubscriptionServiceImplTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        when(brokerProperties.domain()).thenReturn("www.example.com");
+        when(brokerProperties.internalDomain()).thenReturn("www.example.com");
         when(brokerPathProperties.subscriptions()).thenReturn("/example");
         subscriptionService = new SubscriptionServiceImpl(brokerProperties, applicationUtils);
     }
@@ -54,7 +54,7 @@ class SubscriptionServiceImplTest {
         Mockito.when(brokerProperties.paths()).thenReturn(defaultPaths);
 
         when(applicationUtils.getRequest(any())).thenReturn("[]"); // Simulate no existing subscriptions
-        when(brokerProperties.domain()).thenReturn("www.example.com");
+        when(brokerProperties.internalDomain()).thenReturn("www.example.com");
         when(brokerPathProperties.subscriptions()).thenReturn("/example"); // Simulate paths
 
         // Act
@@ -74,7 +74,7 @@ class SubscriptionServiceImplTest {
 
         BrokerPathProperties defaultPaths = new BrokerPathProperties("/api/v1/entities", "/api/v1/subscriptions");
         Mockito.when(brokerProperties.paths()).thenReturn(defaultPaths);
-        when(brokerProperties.domain()).thenReturn("www.example.com");
+        when(brokerProperties.internalDomain()).thenReturn("www.example.com");
         when(brokerPathProperties.subscriptions()).thenReturn("/example"); // Simulate paths
 
         when(applicationUtils.getRequest(any())).thenReturn(convertSubscriptionsToJson(existingSubscriptions));
@@ -105,7 +105,7 @@ class SubscriptionServiceImplTest {
 
         BrokerPathProperties defaultPaths = new BrokerPathProperties("/api/v1/entities", "/api/v1/subscriptions");
         Mockito.when(brokerProperties.paths()).thenReturn(defaultPaths);
-        when(brokerProperties.domain()).thenReturn("www.example.com");
+        when(brokerProperties.internalDomain()).thenReturn("www.example.com");
         when(brokerPathProperties.subscriptions()).thenReturn("/example"); // Simulate paths
 
         // Act

@@ -95,7 +95,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     private List<SubscriptionDTO> getSubscriptions() {
         // Orion-LD URL
-        String orionLdURL = brokerProperties.domain() +
+        String orionLdURL = brokerProperties.internalDomain() +
                 brokerProperties.paths().subscriptions();
         log.debug(" > Getting Orion-LD subscriptions from: {}", orionLdURL);
         // Get subscriptions from Orion-LD
@@ -149,7 +149,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             subscriptionDTO.getNotification().getSubscriptionEndpointDTO().setReceiverInfo(new ArrayList<>());
         }
         // Orion-LD URL
-        String orionLdURL = brokerProperties.domain() + brokerProperties.paths().subscriptions();
+        String orionLdURL = brokerProperties.internalDomain() + brokerProperties.paths().subscriptions();
         log.debug(" > Posting subscription to Orion-LD: {}", orionLdURL);
         // Parse subscription to JSON String object.
         String requestBody;
@@ -166,7 +166,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     private void updateSubscription(SubscriptionDTO existingSubscription, SubscriptionDTO newSubscription) {
         // Orion-LD URL for updating the existing subscription
-        String orionLdURL = brokerProperties.domain() + brokerProperties.paths().subscriptions() + "/" + existingSubscription.getId();
+        String orionLdURL = brokerProperties.internalDomain() + brokerProperties.paths().subscriptions() + "/" + existingSubscription.getId();
         log.debug("Updating subscription in Orion-LD: {}", orionLdURL);
         // Copy the ID from the existing subscription to the new subscription
         newSubscription.setId(existingSubscription.getId());
