@@ -64,12 +64,43 @@ public class ApplicationUtils {
 		// Verify Response HttpStatus
 		checkResponse(response);
 	}
+	public void deleteRequest(String url) {
+		// Create HttpClient
+		HttpClient client = HttpClient.newHttpClient();
+
+		// Build the DELETE request
+		HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create(url))
+				.header(ACCEPT_HEADER, TYPE_APPLICATION_JSON)
+				.DELETE()
+				.build();
+
+		// Send request asynchronously
+		CompletableFuture<HttpResponse<String>> response =
+				client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+
+		// Verify Response HttpStatus
+		checkDeleteResponse(response);
+	}
 
 	private void checkGetResponse(CompletableFuture<HttpResponse<String>> response) {
 		String statusCode = response.thenApply(HttpResponse::statusCode).join().toString();
 		String body = response.thenApply(HttpResponse::body).join();
 		if (statusCode.equals("200")) {
 			log.debug("Request successful");
+		} else if (statusCode.equals("404")) {
+			log.error("Not found");
+			throw new NoSuchElementException("Not found: " + body);
+		} else {
+			log.error("Bad Request");
+			throw new RequestErrorException("Bad Request: " + body);
+		}
+	}
+	private void checkDeleteResponse(CompletableFuture<HttpResponse<String>> response) {
+		String statusCode = response.thenApply(HttpResponse::statusCode).join().toString();
+		String body = response.thenApply(HttpResponse::body).join();
+		if (statusCode.equals("200") || statusCode.equals("202") || statusCode.equals("204")) {
+			log.debug("Delete successful");
 		} else if (statusCode.equals("404")) {
 			log.error("Not found");
 			throw new NoSuchElementException("Not found: " + body);
