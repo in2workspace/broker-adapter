@@ -14,7 +14,7 @@ public class DeleteController {
     private final DeleteService deleteService;
 
     @DeleteMapping("/{entityId}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteOrionLdEntity(@PathVariable("entityId") String entityId) {
         log.info(">>> DELETE /api/v1/delete/{}", entityId);
         deleteService.deleteEntity(entityId);
