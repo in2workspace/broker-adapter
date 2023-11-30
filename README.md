@@ -1,98 +1,174 @@
-# Introduction
+# Broker Adapter
 
-The Orion-LD Adapter is one of the components used by any service that wishes to interact with Orion-LD. It is a RESTful API that offers a wide range of endpoints for interacting with various operations supported by Orion-LD. Additionally, it provides a subscription service that can configure subscriptions on a given server, allowing the creation of multiple subscriptions as needed.
+## Introduction
+The Broker Adapter is one of the components used by any service that wishes to interact with Broker. It is a RESTful API that offers a wide range of endpoints for interacting with various operations supported by NGSI-LD. Additionally, it provides a subscription service that can configure subscriptions on a given server, allowing the creation of multiple subscriptions as needed.
 
-It is built using Java 17, Spring Boot 3.x, and Gradle.
 
-## Main features:
-- Subscribe to new entities stored in Orion-LD.
-- Persist new entities to Orion-LD
-- Manage entities or subscriptions on Orion-LD
+#### Technologies
+The Broker Adapter component is constructed using the following technologies:
 
-## Subscription Components
-[![](https://mermaid.ink/img/pako:eNqVkzFvwjAQhf-K5amVQNCOHlhK1aFFIFJ18mLsS2Mpsd2zjYQQ_72mcZBSAqWZLN_zd--dcnsqrQLKqIevCEbCXItPFA03JH1OYNBSO2ECWQhZaQPnhSJuvETtgrbmyZqAtq4Br-sKwK2WA7Alpur4bc5NW8tdx7PZcBtGVsvinayP7n0gE-H0ZPsw8a14kzsMv_0FzZ4YcWgleJ-Zd_fnjCxNgM4vIy_Qj-hJibY5BSLHN91YusvxJQt90FwEcc3EIOIDUJe7PukypBdlFTe19hWxSJ6VDkOMPxOswbukhn_7XrXTvwmQ_w5GHqdTsny9Gu-k7c82ZwXVpQXFDR3RBrARWqXN2B-xnIYKGuCUpaOCUsQ6cMrNIUlFDLbYGUlZwAgjGp0SoVskykpR-3QLiW1x0W7bz9IdvgG-tT_W?type=png)](https://mermaid.live/edit#pako:eNqVkzFvwjAQhf-K5amVQNCOHlhK1aFFIFJ18mLsS2Mpsd2zjYQQ_72mcZBSAqWZLN_zd--dcnsqrQLKqIevCEbCXItPFA03JH1OYNBSO2ECWQhZaQPnhSJuvETtgrbmyZqAtq4Br-sKwK2WA7Alpur4bc5NW8tdx7PZcBtGVsvinayP7n0gE-H0ZPsw8a14kzsMv_0FzZ4YcWgleJ-Zd_fnjCxNgM4vIy_Qj-hJibY5BSLHN91YusvxJQt90FwEcc3EIOIDUJe7PukypBdlFTe19hWxSJ6VDkOMPxOswbukhn_7XrXTvwmQ_w5GHqdTsny9Gu-k7c82ZwXVpQXFDR3RBrARWqXN2B-xnIYKGuCUpaOCUsQ6cMrNIUlFDLbYGUlZwAgjGp0SoVskykpR-3QLiW1x0W7bz9IdvgG-tT_W)
+- Java 17: The core programming language for building the connector.
+- Spring Boot 3.x: A framework that simplifies the development of Java-based applications, providing a robust and efficient platform.
+- Gradle: A build automation tool that manages the project's dependencies and facilitates the build process.
 
-For the subscriptions we will need to use "/api/v1/subscribe" endpoint, it will permit us to subscribe to a topic.  In this case, the request needs to be a JSON with the following parameters.
+## Functionalities
+The key functionalities of the Broker Adapter include:
+
+- **Interaction with Context Broker:** The adapter provides endpoints for fetching, persisting, updating and deleting data from the Context Broker.
+
+- **CRUD Operations:** Users can perform various CRUD operations, such as persist (POST), update (PATCH), retrieve (GET) and delete (DELETE) entities.
+  - **Create:** Users can create new entities, specifying the entity type and attributes.
+  - **Read:** Users can retrieve entities, specifying the entity ID.
+  - **Update:** Users can update entities, specifying the entity type, ID and attributes.
+  - **Delete:** Users can delete entities, specifying the entity ID.
+
+- **Manage subscriptions to New Entities:** Enables one or various subscriptions to new entities, allowing the user to specify the entity types to which they wish to subscribe. Also, the user can specify where they wish to receive notifications for new entities.
+
+## Installation
+### Prerequisites
+To install the blockchain connector, the following prerequisites are required:
+- Docker or Docker Desktop
+
+### Image installation / Component setup
+
+#### Introduction
+
+For the installation of the component and its remaining dependencies, we will create a docker-compose file that allows us to configure containers from the images needed to install our entire environment. This setup ensures the proper functioning of the Blockchain Connector along with its dependencies, which will also be installed.
+
+
+#### Component Overview
+
+In the docker-compose.yml file, the definition of services is structured collectively under the services section, following the specified header in the document:
+
+```yaml
+version: "3.8"
+services:
+# Following components will be defined here
 ```
-{
-    "type": String,
-    "notification-endpoint-uri": String,
-    "entities": [String]
-}
+
+## `mkt-broker-adapter`
+- **Description:** The main, component providing simplified interactions with the Context Broker.
+- **Image:** `in2kizuna/broker-adapter:v1.0.0-SNAPSHOT`
+- **Ports:** `8083:8080`
+- **Volumes:** Binds `./marketplace1-config.yml` to `/src/main/resources/external-config.yml`.
+- **Links:** Connected to `mkt-context-broker`.
+- **Networks:** Connected to `local_network`.
+
+**Docker Compose Configuration:**
+```yaml
+mkt-broker-adapter:
+  container_name: mkt-broker-adapter
+  image: in2kizuna/broker-adapter:v1.0.0-SNAPSHOT
+  ports:
+    - "8083:8080"
+  volumes:
+    - ./marketplace-config.yml:/src/main/resources/external-config.yml
+  links:
+    - mkt-context-broker
+  networks:
+    - local_network
 ```
-We will need to specify a type, which is typically Subscription. Next, specify the notification endpoint, where an automatic POST request will be made if there are any machines subscribed to the topic we have specified. Then, provide a list of the topics to which we want to subscribe.
 
-## Publisher Components
-[![](https://mermaid.ink/img/pako:eNp1kjFvwyAQhf8KujmW1ZUhS9OtUaK6oxeCz_VJNlA4IkVR_nsutd2qcswE3PveO3FcwfoGQUPC74zO4o7MVzRD7ZSsYCKTpWAcq72xHTlcFo751FPqXr3j6Pse46qkwngmKxajYnIsttuFhVbHQ_WpPh5NJValCVSeX8ow6kZ8Af0ZTUHiEr3FlGajf-AkEuoQybvifafnknpzTHxR7NVcG9H5VDzLmlhpqKU4GBbpSuB6myl4l_ApJtz0YvpXCBsYULKokRFeH1gN3OGANWjZNtia3HMNtbuJ1GT21cVZ0BwzbiCHxvA8cdCt6ZPcYkPs4378Fj-_43YHvODBWg?type=png)](https://mermaid.live/edit#pako:eNp1kjFvwyAQhf8KujmW1ZUhS9OtUaK6oxeCz_VJNlA4IkVR_nsutd2qcswE3PveO3FcwfoGQUPC74zO4o7MVzRD7ZSsYCKTpWAcq72xHTlcFo751FPqXr3j6Pse46qkwngmKxajYnIsttuFhVbHQ_WpPh5NJValCVSeX8ow6kZ8Af0ZTUHiEr3FlGajf-AkEuoQybvifafnknpzTHxR7NVcG9H5VDzLmlhpqKU4GBbpSuB6myl4l_ApJtz0YvpXCBsYULKokRFeH1gN3OGANWjZNtia3HMNtbuJ1GT21cVZ0BwzbiCHxvA8cdCt6ZPcYkPs4378Fj-_43YHvODBWg)
+## `mkt-context-broker`
+- **Description:** Manages context information, facilitating communication between components.
+- **Image:** `fiware/orion-ld:latest`
+- **Command:** Configured with MongoDB host and port.
+- **Ports:** `1027:1026`
+- **Links:** Connected to `mkt-mongo`.
+- **Networks:** Connected to `local_network`.
 
-To publish entities, we need to adhere to the NGSI-LD specifications, which typically require the inclusion of certain mandatory fields. These fields include an "id" as a String to uniquely identify the entity and a "type" indicating the entity's type. If these requirements are met, the entity will be published.
+**Docker Compose Configuration:**
+```yaml
+mkt-context-broker:
+  container_name: mkt-context-broker
+  image: fiware/orion-ld:latest
+  restart: always
+  command: "-dbhost mkt-mongo -port 1026"
+  ports:
+    - "1027:1026"
+  links:
+    - mkt-mongo
+  networks:
+    - local_network
+```
 
-The intention is to expand this section with more operations for Orion-LD, thereby preparing it to integrate this Adapter with any service that requires the handling of Fiware data.
+## Configuration
+In addition to the `docker-compose.yml` file, it is necessary to create a configuration file that includes, at a minimum, the following fields for proper functionality. The example configuration provided aligns with the previously defined components in the Docker Compose setup.
 
-# Getting Started
+**Example `marketplace-config.yml`:**
 
-## Prerequisites
-- [Java 17](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
-- [Gradle](https://gradle.org/install/)
-- [Spring Boot](https://spring.io/projects/spring-boot/)
-- [MongoDB](https://www.mongodb.com/)
-- [Docker Desktop](https://www.docker.com/)
-- [Go](https://golang.org/)
-- [IntelliJ IDEA](https://www.jetbrains.com/idea/)
-- [Git](https://git-scm.com/)
-- [Azure DevOps](https://azure.microsoft.com/en-us/services/devops/)
-- [Orion-LD](https://github.com/FIWARE/context.Orion-LD/blob/develop/doc/manuals-ld/installation-guide-docker.md)
+```yaml
+# Context Broker Configuration
+broker:
+  externalDomain: https://<example.com>/orion-ld
+  internalDomain: http://mkt-context-broker:1026
+```
+This section configures the Context Broker with both external and internal domains. The external domain is where the Context Broker is accessible from outside, and the internal domain is its address within the environment.
 
-## Application profiles
-- <b>*Default*</b>: this profile is only used to execute test during the CI/CD pipeline.
-- <b>DEV</b>: this profile is used to execute the application in a Docker container.
-- <b>TEST</b>: this profile is used to execute the application in a pre-production environment.
-- <b>PROD</b>: this profile is used to execute the application in a production environment.
+## Usage
 
-## API references (DEV environment)
-- Swagger: http://localhost:8080/swagger-ui.html
-- OpenAPI: http://localhost:8080/api-docs
--
-## Installing
-- Clone Blockchain Connector project and Alastria Red T to your local machine.
-  ```git clone https://dev.azure.com/in2Dome/DOME/_git/in2-dome-blockchain_connector_orionld_interface```
-  ```git clone https://dev.azure.com/in2Dome/DOME/_git/in2-test-alastria_red_t```
-- Open/Run Docker Desktop
-- Navigate to the root folder of the in2-test-alastria_red_t and execute the docker-compose. This will execute the Alastria Red T that consists in 6 local nodes (1 boot, 1 regular, and 4 validators).
-  ```cd in2-test-alastria_red_t```
-  ```docker-compose up -d```
-- Navigate to the root folder of the in2-dome-blockchain_connector and build the docker image. This will execute the Blockchain Connector Solution.
-  ```cd in2-dome-blockchain-connector-orionld-interface```
-  ```docker build -t blk-conn-orionld-intf  . ```
-- Navigate to the root folder of the in2-dome-iac/blockchain-connector and execute the docker-compose. This will execute the Blockchain Connector Solution, the Orion Context Broker, and the MongoDB linked to Context Broker
-  ```cd in2-dome-iac/blockchain-connector```
-  ```docker-compose up -d```
+After implementing both the `docker-compose.yml` and configuration files, the next step is to compose the Docker services with the command:
 
+`docker-compose up -d`
 
-## Orion-LD Documentation and Tools
-- [Orion-LD Context Broker GitHub Repository with Documentation](https://github.com/FIWARE/context.Orion-LD)
-- [Orion-LD Test Suite GitHub Repository](https://github.com/FIWARE/NGSI-LD_TestSuite/tree/master)
-- [Orion-LD Context Broker Swagger UI](https://forge.etsi.org/swagger/ui/?url=https://forge.etsi.org/rep/NGSI-LD/NGSI-LD/-/raw/master/spec/updated/generated/full_api.json#/)
+Subsequently, within Docker, wait for all components to initialize properly. Once everything has initialized successfully (in case of any issues, double-check the endpoint addresses in the configuration file), the Broker Adapter will be ready to use.
 
-# License
-- [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)
+Users can utilize tools like POSTMAN for entity/subscription management, ensuring that the entity type matches the type established for subscription beforehand.
 
-## Third Party Licenses
+### Broker Adapter Endpoints
 
-# Acknowledgments
-We extend heartfelt gratitude to [FIWARE Foundation](https://www.fiware.org/foundation/), DOME teams project, [Alastria](https://alastria.io/), and [DigitelTS](https://digitelts.es/) for their invaluable contributions to our project. Their support, expertise, and resources have been pivotal in shaping this solution, driving innovation, and overcoming challenges. Without their collaboration, this project would not have been possible. We are honored to have worked with such visionary and innovative partners, and we look forward to future collaborations and successes together. Thank you for being essential pillars in our journey.
+#### 1. Delete Entity
 
-# Authors
-- [IN2](https://in2.es), [Oriol Canadés](mailto:oriol.canades@in2.es)
+- **Endpoint:** `http://<domain>/api/v1/delete/<id>` (DELETE)
+- **Description:** Deletes the entity with the specified ID.
 
-# Document Version
-- v0.0.2
+#### 2. Subscribe to Entities
 
+- **Endpoint:** `http://<domain>/api/v1/subscribe` (POST)
+- **Description:** Subscribes to specified entity types. Notifications will be redirected to the provided URI.
+- **Request Body Example:**
+  ```json
+  {
+    "id": "example_subscription_id",
+    "type": "Subscription",
+    "notification-endpoint-uri": "http://example.com/notifications",
+    "entities": ["Type1", "Type2"]
+  }
+  ```
 
+#### 3. Retrieve Entity by ID
 
+- **Endpoint:** `http://<domain>/api/v1/entities/<id>` (GET)
+- **Description:** Retrieves the entity with the specified ID.
 
+#### 4. Publish Entity
+
+- **Endpoint:** `http://<domain>/api/v1/publish` (POST)
+- **Description:** Publishes the specified entity provided in the request body.
+
+#### 5. Update Entity by ID
+
+- **Endpoint:** `http://<domain>/api/v1/update/<id>` (PATCH)
+- **Description:** Updates the entity with the specified ID, replacing it with the body provided in the request.
+
+## Contribution
+
+## License
 
 
+## Project/Component Status
+This project is in version 1.0.0 of the MVP (Minimum Viable Product) for the Broker Adapter at 12/04/2023.
+
+## Contact
+
+For any inquiries or further information, feel free to reach out to us:
+
+- **Email:** [info@in2.es](mailto:info@in2.es)
+- **Name:** IN2, Ingeniería de la Información
+- **Website:** [https://in2.es](https://in2.es)
+
+## Acknowledgments
 
 
-
+## Creation Date and Last Update
+This project was created on July 07, 2023, and last updated on December 4, 2023.
