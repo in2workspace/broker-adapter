@@ -4,11 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.in2.brokeradapter.config.BrokerProperties;
 import es.in2.brokeradapter.exception.SubscriptionCreationException;
-import es.in2.brokeradapter.model.SubscriptionDTO;
-import es.in2.brokeradapter.model.SubscriptionEndpointDTO;
-import es.in2.brokeradapter.model.SubscriptionEntityDTO;
-import es.in2.brokeradapter.model.SubscriptionNotificationDTO;
-import es.in2.brokeradapter.model.SubscriptionRequestDTO;
+import es.in2.brokeradapter.model.*;
 import es.in2.brokeradapter.service.SubscriptionService;
 import es.in2.brokeradapter.utils.ApplicationUtils;
 import lombok.RequiredArgsConstructor;
@@ -79,6 +75,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         // Create SubscriptionEndpointDTO from SubscribeRequestDTO
         SubscriptionEndpointDTO subscriptionEndpointDTO = SubscriptionEndpointDTO.builder()
                 .uri(subscriptionRequestDTO.getNotificationEndpointUri())
+                .accept("application/json")
+                .receiverInfo((List.of(new RetrievalInfoContentTypeDTO())))
                 .build();
         // Create SubscriptionNotificationDTO from SubscriptionEndpointDTO
         SubscriptionNotificationDTO subscriptionNotificationDTO = SubscriptionNotificationDTO.builder()
@@ -95,8 +93,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     private List<SubscriptionDTO> getSubscriptions() {
         // Orion-LD URL
-        String orionLdURL = brokerProperties.internalDomain() +
-                brokerProperties.paths().subscriptions();
+        String orionLdURL = brokerProperties.internalDomain() + brokerProperties.paths().subscriptions();
         log.debug(" > Getting Orion-LD subscriptions from: {}", orionLdURL);
         // Get subscriptions from Orion-LD
         String response = applicationUtils.getRequest(orionLdURL);
@@ -110,7 +107,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             log.error("Error parsing subscriptions from Orion-LD: {}", e.getMessage());
             throw new SubscriptionCreationException("Error parsing subscriptions from Orion-LD");
         }
-
     }
 
     private boolean checkIfSubscriptionExists(SubscriptionDTO subscriptionDTO, List<SubscriptionDTO> subscriptionList) {
@@ -145,9 +141,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
 
     private void createSubscription(SubscriptionDTO subscriptionDTO) {
-        if(subscriptionDTO.getNotification().getSubscriptionEndpointDTO().getReceiverInfo() == null) {
-            subscriptionDTO.getNotification().getSubscriptionEndpointDTO().setReceiverInfo(new ArrayList<>());
-        }
         // Orion-LD URL
         String orionLdURL = brokerProperties.internalDomain() + brokerProperties.paths().subscriptions();
         log.debug(" > Posting subscription to Orion-LD: {}", orionLdURL);
