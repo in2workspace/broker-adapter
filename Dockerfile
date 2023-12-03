@@ -21,4 +21,4 @@ RUN addgroup -S nonroot \
 USER nonroot
 WORKDIR /app
 COPY --from=TEMP_BUILD /home/gradle/src/build/libs/*.jar /app/
-ENTRYPOINT ["java", "-jar", "/app/broker-adapter-1.0.0-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "/app/broker-adapter-1.0.0.jar"]
