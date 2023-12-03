@@ -55,7 +55,6 @@ dependencies {
 
 	// Documentation
 	implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.2.0'
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
 
 	// Logback
 	implementation 'ch.qos.logback:logback-classic:1.4.11'
