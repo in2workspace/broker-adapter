@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class DeleteControllerTest {
+class DeleteControllerTest {
     @Mock
     private MockMvc mockMvc;
 
@@ -38,7 +38,8 @@ public class DeleteControllerTest {
     void testDeleteRequest() throws Exception {
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders
                         .delete("/api/v1/delete/urn:ngsi-ld:product-offering:1234"))
-                .andExpect(status().isOk())
+                .andExpect(status().isNoContent())
                 .andReturn();
     }
+
 }

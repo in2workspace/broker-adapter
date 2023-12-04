@@ -17,6 +17,7 @@ import lombok.Setter;
 public class RetrievalInfoContentTypeDTO {
 
 	@JsonProperty("Content-Type")
+	@Builder.Default
 	private String contentType = "application/json";
 
 }
