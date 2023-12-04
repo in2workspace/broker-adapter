@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.0] - 2023-12-04
+## [2.0.0-SNAPSHOT] - 2023-12-04
 - Migrated to WebFlux and reactive programming.
 - Summarized the controllers and service classes - Entities and Subscriptions.
 - Changed endpoints to be more RESTful.

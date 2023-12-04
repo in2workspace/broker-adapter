@@ -40,7 +40,7 @@ class SubscriptionControllerTests {
                 .bindToController(subscriptionController)
                 .build()
                 .post()
-                .uri("/api/v1/subscriptions")
+                .uri("/api/v2/subscriptions")
                 .bodyValue(subscriptionRequest)
                 .exchange()
                 .expectStatus().isCreated();

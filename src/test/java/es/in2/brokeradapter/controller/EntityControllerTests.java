@@ -43,7 +43,7 @@ class EntityControllerTests {
                 .bindToController(entityController)
                 .build()
                 .post()
-                .uri("/api/v1/entities")
+                .uri("/api/v2/entities")
                 .bodyValue(entity)
                 .exchange()
                 .expectStatus().isCreated();
@@ -57,7 +57,7 @@ class EntityControllerTests {
                 .bindToController(entityController)
                 .build()
                 .get()
-                .uri("/api/v1/entities/{entityId}", entityId)
+                .uri("/api/v2/entities/{entityId}", entityId)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(String.class).isEqualTo(entity);
@@ -72,7 +72,7 @@ class EntityControllerTests {
                 .bindToController(entityController)
                 .build()
                 .patch()
-                .uri("/api/v1/entities")
+                .uri("/api/v2/entities")
                 .bodyValue(entity)
                 .exchange()
                 .expectStatus().isNoContent();
@@ -87,7 +87,7 @@ class EntityControllerTests {
                 .bindToController(entityController)
                 .build()
                 .delete()
-                .uri("/api/v1/entities/{entityId}", entityId)
+                .uri("/api/v2/entities/{entityId}", entityId)
                 .exchange()
                 .expectStatus().isNoContent();
     }
