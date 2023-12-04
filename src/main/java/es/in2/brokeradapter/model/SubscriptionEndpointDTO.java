@@ -18,9 +18,11 @@ public class SubscriptionEndpointDTO {
 	private String uri;
 
 	@JsonProperty("accept")
+	@Builder.Default
 	private String accept = "application/json";
 
 	@JsonProperty("receiverInfo")
+	@Builder.Default
 	private List<RetrievalInfoContentTypeDTO> receiverInfo = List.of(new RetrievalInfoContentTypeDTO());
 
 }
