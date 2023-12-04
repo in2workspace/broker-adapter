@@ -17,7 +17,7 @@ import static es.in2.brokeradapter.utils.MessageUtils.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/entities")
+@RequestMapping("/api/v2/entities")
 @RequiredArgsConstructor
 @Tag(name = "Entity Controller", description = "APIs for managing entities")
 public class EntityController {

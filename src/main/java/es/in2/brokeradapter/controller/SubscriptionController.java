@@ -19,7 +19,7 @@ import static es.in2.brokeradapter.utils.MessageUtils.RESPONSE_CODE_500_DESCRIPT
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/subscriptions")
+@RequestMapping("/api/v2/subscriptions")
 @RequiredArgsConstructor
 @Tag(name = "Subscription Controller", description = "APIs for managing subscriptions")
 public class SubscriptionController {
