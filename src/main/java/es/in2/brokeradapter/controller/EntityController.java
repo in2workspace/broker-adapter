@@ -13,6 +13,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
+import static es.in2.brokeradapter.utils.MessageUtils.*;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/entities")
@@ -27,11 +29,11 @@ public class EntityController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create an entity", description = "Creates a new entity.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Entity created successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = RESPONSE_CODE_201, description = RESPONSE_CODE_201_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_400, description = RESPONSE_CODE_400_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_401, description = RESPONSE_CODE_401_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_403, description = RESPONSE_CODE_403_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_500, description = RESPONSE_CODE_500_DESCRIPTION)
     })
     public Mono<Void> createEntity(@RequestBody String requestBody) {
         String processId = UUID.randomUUID().toString();
@@ -43,12 +45,12 @@ public class EntityController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get entity by ID", description = "Retrieves an entity by its ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Entity retrieved successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "404", description = "Entity not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = RESPONSE_CODE_200, description = RESPONSE_CODE_200_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_400, description = RESPONSE_CODE_400_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_401, description = RESPONSE_CODE_401_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_403, description = RESPONSE_CODE_403_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_404, description = RESPONSE_CODE_404_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_500, description = RESPONSE_CODE_500_DESCRIPTION)
     })
     public Mono<String> getEntityById(@PathVariable("entityId") String entityId) {
         String processId = UUID.randomUUID().toString();
@@ -59,11 +61,11 @@ public class EntityController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update an entity", description = "Updates an existing entity.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Entity updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = RESPONSE_CODE_204, description = RESPONSE_CODE_204_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_400, description = RESPONSE_CODE_400_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_401, description = RESPONSE_CODE_401_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_403, description = RESPONSE_CODE_403_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_500, description = RESPONSE_CODE_500_DESCRIPTION)
     })
     public Mono<Void> updateEntity(@RequestBody String requestBody) {
         String processId = UUID.randomUUID().toString();
@@ -74,11 +76,11 @@ public class EntityController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete entity by ID", description = "Deletes an entity by its ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Entity created successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = RESPONSE_CODE_204, description = RESPONSE_CODE_204_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_400, description = RESPONSE_CODE_400_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_401, description = RESPONSE_CODE_401_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_403, description = RESPONSE_CODE_403_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_500, description = RESPONSE_CODE_500_DESCRIPTION)
     })
     public Mono<Void> deleteEntityById(@PathVariable("entityId") String entityId) {
         String processId = UUID.randomUUID().toString();

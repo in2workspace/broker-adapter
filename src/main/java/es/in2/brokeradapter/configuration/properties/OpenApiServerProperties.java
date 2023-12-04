@@ -11,7 +11,7 @@ public record OpenApiServerProperties(String url, String description) {
     @ConstructorBinding
     public OpenApiServerProperties(String url, String description) {
         this.url = isNullOrBlank(url) ? "https://localhost:8080" : url;
-        this.description = isNullOrBlank(description) ? "<server description>" : description;
+        this.description = isNullOrBlank(description) ? "{server description}" : description;
     }
 
 }

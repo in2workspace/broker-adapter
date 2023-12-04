@@ -19,6 +19,13 @@ public class GlobalExceptionHandler {
         return Mono.empty();
     }
 
+    @ExceptionHandler(EntityAlreadyExistException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    public Mono<Void> handleEntityAlreadyExistException(EntityAlreadyExistException e) {
+        return Mono.empty();
+    }
+
     @ExceptionHandler(UnauthorizedAccessException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody

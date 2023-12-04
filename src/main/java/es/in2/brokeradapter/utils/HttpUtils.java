@@ -1,5 +1,6 @@
 package es.in2.brokeradapter.utils;
 
+import es.in2.brokeradapter.exception.EntityAlreadyExistException;
 import es.in2.brokeradapter.exception.ForbiddenAccessException;
 import es.in2.brokeradapter.exception.UnauthorizedAccessException;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,8 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
+import static es.in2.brokeradapter.utils.MessageUtils.*;
 
 @Slf4j
 @Component
@@ -76,17 +79,20 @@ public class HttpUtils {
 
     private static Mono<? extends Throwable> check4xxResponse(String processId, ClientResponse clientResponse) {
         if (clientResponse.statusCode() == HttpStatus.NOT_FOUND) {
-            log.warn("ProcessId: {}, Resource not found", processId);
-            return Mono.error(new NoSuchElementException("Error during get request: " + clientResponse.statusCode()));
+            log.warn(RESOURCE_NOT_FOUND_MESSAGE, processId);
+            return Mono.error(new NoSuchElementException("Error during request: Not Found - Status: " + clientResponse.statusCode()));
         } else if (clientResponse.statusCode() == HttpStatus.UNAUTHORIZED) {
-            log.warn("ProcessId: {}, Unauthorized access", processId);
-            return Mono.error(new UnauthorizedAccessException("Error during get request: Unauthorized"));
+            log.warn(UNAUTHORIZED_ACCESS_MESSAGE, processId);
+            return Mono.error(new UnauthorizedAccessException("Error during request: Unauthorized - Status: " + clientResponse.statusCode()));
         } else if (clientResponse.statusCode() == HttpStatus.FORBIDDEN) {
-            log.warn("ProcessId: {}, Access forbidden", processId);
-            return Mono.error(new ForbiddenAccessException("Error during get request: Forbidden"));
+            log.warn(ACCESS_FORBIDDEN_MESSAGE, processId);
+            return Mono.error(new ForbiddenAccessException("Error during request: Forbidden - Status: " + clientResponse.statusCode()));
+        } else if (clientResponse.statusCode() == HttpStatus.CONFLICT) {
+            log.warn(ENTITY_ALREADY_EXIST_MESSAGE, processId);
+            return Mono.error(new EntityAlreadyExistException("Error during request: Conflict - Status: " + clientResponse.statusCode()));
         } else {
-            log.error("ProcessId: {}, Error during get request: {}", processId, clientResponse.statusCode());
-            return Mono.error(new RuntimeException("Error during get request:" + clientResponse.statusCode()));
+            log.error(ERROR_DURING_REQUEST_MESSAGE, processId, clientResponse.statusCode());
+            return Mono.error(new RuntimeException("Error during request: " + clientResponse.statusCode()));
         }
     }
 

@@ -14,6 +14,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
+import static es.in2.brokeradapter.utils.MessageUtils.*;
+import static es.in2.brokeradapter.utils.MessageUtils.RESPONSE_CODE_500_DESCRIPTION;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/subscriptions")
@@ -27,11 +30,11 @@ public class SubscriptionController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a subscription", description = "Creates a new subscription.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Subscription created successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad request"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = RESPONSE_CODE_201, description = RESPONSE_CODE_201_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_400, description = RESPONSE_CODE_400_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_401, description = RESPONSE_CODE_401_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_403, description = RESPONSE_CODE_403_DESCRIPTION),
+            @ApiResponse(responseCode = RESPONSE_CODE_500, description = RESPONSE_CODE_500_DESCRIPTION)
     })
     public Mono<Void> createSubscription(@RequestBody SubscriptionRequest subscriptionRequest) {
         String processId = UUID.randomUUID().toString();

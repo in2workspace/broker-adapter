@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static es.in2.brokeradapter.utils.HttpUtils.*;
+import static es.in2.brokeradapter.utils.MessageUtils.*;
 
 @Slf4j
 @Service
@@ -31,13 +32,15 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         // Get all subscriptions from Context Broker
         return createSubscriptionObject(processId, subscriptionRequest)
                 .flatMap(newSubscription -> getSubscriptionsFromBroker(processId)
+                        .doOnSuccess(result -> log.info(SUBSCRIPTION_RETRIEVED_MESSAGE, processId))
+                        .doOnError(e -> log.error(ERROR_RETRIEVING_SUBSCRIPTION_MESSAGE, processId, e.getMessage()))
                         .flatMap(subscriptionList -> {
                             if (subscriptionList.isEmpty()) {
                                 // Use Case: The subscription list is empty.
                                 log.debug("ProcessId: {}, Subscription list is empty. Creating new subscription.", processId);
                                 return postSubscription(processId, newSubscription)
-                                        .doOnSuccess(result -> log.info("ProcessId: {}, Subscription created successfully", processId))
-                                        .doOnError(e -> log.error("ProcessId: {}, Error while creating subscription: {}", processId, e.getMessage()));
+                                        .doOnSuccess(result -> log.info(SUBSCRIPTION_CREATED_MESSAGE, processId))
+                                        .doOnError(e -> log.error(ERROR_CREATING_SUBSCRIPTION_MESSAGE, processId, e.getMessage()));
                             } else {
                                 Optional<SubscriptionDTO> subscriptionItemFound = checkIfSubscriptionExists(newSubscription, subscriptionList);
 
@@ -55,16 +58,16 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                                         // but the endpoint and the entities are different.
                                         log.debug("ProcessId: {}, Updating subscription.", processId);
                                         return updateSubscription(processId, subscriptionItem, newSubscription)
-                                                .doOnSuccess(result -> log.info("ProcessId: {}, Subscription updated successfully", processId))
-                                                .doOnError(e -> log.error("ProcessId: {}, Error while updating subscription: {}", processId, e.getMessage()));
+                                                .doOnSuccess(result -> log.info(SUBSCRIPTION_UPDATED_MESSAGE, processId))
+                                                .doOnError(e -> log.error(ERROR_UPDATING_SUBSCRIPTION_MESSAGE, processId, e.getMessage()));
                                     }
                                 } else {
                                     log.debug("ProcessId: {}, Subscription Entity Not Found", processId);
                                     // Use Case: The subscription you are trying to create does not exist in the list.
                                     log.debug("ProcessId: {}, Subscription does not exist. Creating new subscription.", processId);
                                     return postSubscription(processId, newSubscription)
-                                            .doOnSuccess(result -> log.info("ProcessId: {}, Subscription created successfully", processId))
-                                            .doOnError(e -> log.error("ProcessId: {}, Error while creating subscription: {}", processId, e.getMessage()));
+                                            .doOnSuccess(result -> log.info(SUBSCRIPTION_CREATED_MESSAGE, processId))
+                                            .doOnError(e -> log.error(ERROR_CREATING_SUBSCRIPTION_MESSAGE, processId, e.getMessage()));
                                 }
                             }
                         })
@@ -80,7 +83,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         SubscriptionNotificationDTO subscriptionNotificationDTO = SubscriptionNotificationDTO.builder()
                 .subscriptionEndpointDTO(SubscriptionEndpointDTO.builder()
                         .uri(subscriptionRequest.notificationEndpointUri())
-                        .accept("application/json")
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
                         .receiverInfo((List.of(new RetrievalInfoContentTypeDTO())))
                         .build())
                 .build();
@@ -92,8 +95,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                         .notification(subscriptionNotificationDTO)
                         .build()
                 )
-                .doOnSuccess(result -> log.info("ProcessId: {}, Subscription object created successfully", processId))
-                .doOnError(e -> log.error("ProcessId: {}, Error while creating subscription object: {}", processId, e.getMessage()));
+                .doOnSuccess(result -> log.info(SUBSCRIPTION_OBJECT_CREATED_MESSAGE, processId))
+                .doOnError(e -> log.error(ERROR_CREATING_SUBSCRIPTION_OBJECT_MESSAGE, processId, e.getMessage()));
     }
 
     private Mono<List<SubscriptionDTO>> getSubscriptionsFromBroker(String processId) {
@@ -102,13 +105,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return getRequest(processId, brokerURL, headers)
                 .flatMap(response -> {
                     try {
-                        log.debug("ProcessId: {}, Subscriptions retrieved successfully: {}", processId, response);
                         // Parse subscription response to Subscription list
                         return Mono.just(objectMapper.readValue(response,
                                 objectMapper.getTypeFactory().constructCollectionType(List.class, SubscriptionDTO.class)));
                     } catch (JsonProcessingException e) {
-                        log.error("ProcessId: {}, Error parsing subscriptions from Context Broker: {}", processId, e.getMessage());
-                        return Mono.error(new SubscriptionCreationException("Error parsing subscriptions from Context Broker"));
+                        log.error(ERROR_PARSING_SUBSCRIPTION_TO_JSON_MESSAGE, processId, e.getMessage());
+                        return Mono.error(new SubscriptionCreationException(ERROR_PARSING_SUBSCRIPTIONS_MESSAGE));
                     }
                 });
     }
@@ -119,11 +121,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             List<Map.Entry<String, String>> headers = List.of(
                     new AbstractMap.SimpleEntry<>(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
             return postRequest(processId, brokerURL, headers, objectMapper.writeValueAsString(subscriptionDTO))
-                    .doOnSuccess(result -> log.info("ProcessId: {}, Subscription posted successfully", processId))
-                    .doOnError(e -> log.error("ProcessId: {}, Error while posting subscription: {}", processId, e.getMessage()));
+                    .doOnSuccess(result -> log.info(SUBSCRIPTIONS_FETCHED_SUCCESSFULLY_MESSAGE, processId))
+                    .doOnError(e -> log.error(ERROR_FETCHING_SUBSCRIPTIONS_MESSAGE, processId, e.getMessage()));
         } catch (JsonProcessingException e) {
-            log.error("ProcessId: {}, Error parsing subscription to JSON: {}", processId, e.getMessage());
-            return Mono.error(new SubscriptionCreationException("Error parsing subscription to JSON"));
+            log.error(ERROR_PARSING_SUBSCRIPTION_TO_JSON_MESSAGE, processId, e.getMessage());
+            return Mono.error(new SubscriptionCreationException(ERROR_PARSING_SUBSCRIPTIONS_MESSAGE));
         }
     }
 
@@ -136,11 +138,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             List<Map.Entry<String, String>> headers = List.of(
                     new AbstractMap.SimpleEntry<>(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
             return patchRequest(processId, brokerURL, headers, objectMapper.writeValueAsString(newSubscription))
-                    .doOnSuccess(result -> log.info("ProcessId: {}, Subscription updated successfully", processId))
-                    .doOnError(e -> log.error("ProcessId: {}, Error while updating subscription: {}", processId, e.getMessage()));
+                    .doOnSuccess(result -> log.info(SUBSCRIPTIONS_FETCHED_SUCCESSFULLY_MESSAGE, processId))
+                    .doOnError(e -> log.error(ERROR_FETCHING_SUBSCRIPTIONS_MESSAGE, processId, e.getMessage()));
         } catch (JsonProcessingException e) {
-            log.error("ProcessId: {}, Error parsing subscription to JSON: {}", processId, e.getMessage());
-            return Mono.error(new SubscriptionCreationException("Error parsing subscription to JSON"));
+            log.error(ERROR_PARSING_SUBSCRIPTION_TO_JSON_MESSAGE, processId, e.getMessage());
+            return Mono.error(new SubscriptionCreationException(ERROR_PARSING_SUBSCRIPTIONS_MESSAGE));
         }
     }
 
