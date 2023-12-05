@@ -72,6 +72,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                             }
                         })
                 );
+
     }
 
     private Mono<SubscriptionDTO> createSubscriptionObject(String processId, SubscriptionRequest subscriptionRequest) {

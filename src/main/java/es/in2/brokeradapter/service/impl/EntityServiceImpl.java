@@ -61,7 +61,7 @@ public class EntityServiceImpl implements EntityService {
                 .doOnError(e -> log.error(ERROR_UPDATING_RESOURCE_MESSAGE, e.getMessage()));
     }
 
-    Mono<String> getEntityIdFromRequestBody(String processId, String requestBody) {
+    private Mono<String> getEntityIdFromRequestBody(String processId, String requestBody) {
         try {
             JsonNode jsonNode = objectMapper.readTree(requestBody);
             if (jsonNode.has("id")) {
