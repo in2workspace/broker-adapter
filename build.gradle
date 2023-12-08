@@ -67,7 +67,6 @@ dependencies {
 	// Testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test:3.6.0'
-
 }
 
 tasks.named('compileJava') {
@@ -96,5 +95,17 @@ tasks.jacocoTestReport {
 					'**/utils/**'
 			])
 		}))
+	}
+}
+
+tasks.register('printVersion') {
+	doLast {
+		println version
+	}
+}
+
+tasks.register('printProjectName') {
+	doLast {
+		println rootProject.name
 	}
 }
