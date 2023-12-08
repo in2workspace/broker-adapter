@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'es.in2'
-version = '1.0.1'
+version = '1.1.0'
 
 java {
 	sourceCompatibility = '17'
@@ -39,7 +39,6 @@ dependencies {
 	// Testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
-
 }
 
 tasks.named('test') {
@@ -57,5 +56,17 @@ tasks.jacocoTestReport {
 		xml.required.set(true)
 		csv.required.set(false)
 		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+	}
+}
+
+tasks.register('printVersion') {
+	doLast {
+		println version
+	}
+}
+
+tasks.register('printProjectName') {
+	doLast {
+		println rootProject.name
 	}
 }
