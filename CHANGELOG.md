@@ -18,10 +18,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added OWASP dependency check - static analysis.
 - Added GitHub Actions for CI/CD.
 
-## [1.0.1] - 2023-12-04
-- Fix bug in the subscription.
+## [1.1.0] - 2023-12-08
+### Added
+- Add support for GitHub Actions.
+
+## [1.0.1] - 2023-12-01
+### Changed
+- Fix default initialization of RetrievalInfoContentTypeDTO attribute.
+- Update the README.md file with the new version.
 
 ## [1.0.0] - 2023-11-21
+- Fix bug in the subscription.
+
+## [1.0.0] - Release
 ### Added
  - Publish entities to a given Context Broker.
  - Get entities from a given Context Broker.
@@ -30,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Make a subscription for a topic to the Context Broker.
  - Update a subscription for a topic to the Context Broker.
 
-[release]: 
-[1.0.1]: https://github.com/in2workspace/broker-adapter/releases/tag/v1.0.1
-[1.0.0]: https://github.com/in2workspace/broker-adapter/releases/tag/v1.0.0
+[release]:
+- [v1.1.0](https://github.com/in2workspace/broker-adapter/releases/tag/v1.1.0)
+- [v1.0.1](https://github.com/in2workspace/broker-adapter/releases/tag/v1.0.1)
+- [v1.0.0](https://github.com/in2workspace/broker-adapter/releases/tag/v1.0.0)
