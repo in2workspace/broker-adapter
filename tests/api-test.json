@@ -1,0 +1,154 @@
+{
+  "info": {
+    "_postman_id": "582f60b6-a547-4759-89b6-921f4904a8a9",
+    "name": "Broker Adapter",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "10786101"
+  },
+  "item": [
+    {
+      "name": "entities",
+      "item": [
+        {
+          "name": "Create Entity",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": \"house2:smartrooms:room1\",\r\n    \"type\": \"Room\",\r\n    \"temperature\": {\r\n        \"value\": 30,\r\n        \"unitCode\": \"CEL\",\r\n        \"type\": \"Property\",\r\n        \"providedBy\": {\r\n            \"type\": \"Relationship\",\r\n            \"object\": \"smartbuilding:house2:sensor0815\"\r\n        }\r\n    },\r\n    \"isPartOf\": {\r\n        \"type\": \"Relationship\",\r\n        \"object\": \"smartcity:houses:house2\"\r\n    },\r\n    \"@context\": [\r\n        {\r\n            \"Room\": \"urn:mytypes:room\",\r\n            \"temperature\": \"myuniqueuri:temperature\",\r\n            \"isPartOf\": \"myuniqueuri:isPartOf\"\r\n        },\r\n        \"https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld\"\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/v1/entities",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "entities"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Entity By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8083/api/v1/entities/house2:smartrooms:room1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "entities",
+                "house2:smartrooms:room1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Entity",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": \"house2:smartrooms:room1\",\r\n    \"type\": \"Room\",\r\n    \"temperature\": {\r\n        \"value\": 30,\r\n        \"unitCode\": \"CEL\",\r\n        \"type\": \"Property\",\r\n        \"providedBy\": {\r\n            \"type\": \"Relationship\",\r\n            \"object\": \"smartbuilding:house2:sensor0815\"\r\n        }\r\n    },\r\n    \"isPartOf\": {\r\n        \"type\": \"Relationship\",\r\n        \"object\": \"smartcity:houses:house2\"\r\n    },\r\n    \"@context\": [\r\n        {\r\n            \"Room\": \"urn:mytypes:room\",\r\n            \"temperature\": \"myuniqueuri:temperature\",\r\n            \"isPartOf\": \"myuniqueuri:isPartOf\"\r\n        },\r\n        \"https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld\"\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/v1/entities",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "entities"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Entity",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8083/api/v1/entities/house2:smartrooms:room1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "entities",
+                "house2:smartrooms:room1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "subscriptions",
+      "item": [
+        {
+          "name": "Create and Update Subscriptions",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": \"1234\",\r\n    \"type\": \"Subscription\",\r\n    \"notification-endpoint-uri\": \"http://localhost:8080/test\",\r\n    \"entities\": [\r\n        \"ProductOffering\", \"CredentialRequests\"\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/v1/subscriptions",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8083",
+              "path": [
+                "api",
+                "v1",
+                "subscriptions"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

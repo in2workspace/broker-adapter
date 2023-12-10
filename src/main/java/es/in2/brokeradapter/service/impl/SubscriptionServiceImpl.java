@@ -2,180 +2,172 @@ package es.in2.brokeradapter.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.in2.brokeradapter.config.BrokerProperties;
+import es.in2.brokeradapter.configuration.properties.BrokerProperties;
+import es.in2.brokeradapter.domain.*;
 import es.in2.brokeradapter.exception.SubscriptionCreationException;
-import es.in2.brokeradapter.model.*;
 import es.in2.brokeradapter.service.SubscriptionService;
-import es.in2.brokeradapter.utils.ApplicationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static es.in2.brokeradapter.utils.HttpUtils.*;
+import static es.in2.brokeradapter.utils.MessageUtils.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class SubscriptionServiceImpl implements SubscriptionService {
 
-    public static final String SUBSCRIPTION_ID_PREFIX = "urn:ngsi-ld:Subscription:";
+    private final ObjectMapper objectMapper;
     private final BrokerProperties brokerProperties;
-    private final ApplicationUtils applicationUtils;
 
     @Override
-    public void processSubscriptionRequest(SubscriptionRequestDTO subscriptionRequestDTO) {
-        log.info(">>> Creating Orion-LD subscription...");
-        // Create SubscriptionDTO from SubscribeRequestDTO
-        SubscriptionDTO newSubscription = createSubscriptionDTO(subscriptionRequestDTO);
-        log.debug(" > Orion-LD subscription: {}", newSubscription.toString());
-        // Get Orion-LD stored subscriptions
-        List<SubscriptionDTO> subscriptionListFound = getSubscriptions();
-        log.debug(" > Orion-LD subscriptions found: {}", subscriptionListFound.toString());
-        // The list of subscriptions returned by Orion-LD is empty, so we create the subscription.
-        if(subscriptionListFound.isEmpty()) {
-            createSubscription(newSubscription);
-        }
-        // The list of subscriptions returned by Orion-LD is not empty, so we check if the subscription already exists.
-        else if (checkIfSubscriptionExists(newSubscription, subscriptionListFound)) {
-            // The subscription you are trying to create has the same notification endpoint and entity list as an
-            // existing subscription. Therefore, it is not necessary to create a new subscription.
-            log.info(" > Subscription already exists. Does not need to be created.");
-        }
-        // In this case, the subscription does not exactly exist within the list, so we create or update it.
-        else {
-            subscriptionListFound.forEach(subscription -> {
-                // If the endpoints are the same and the entities are not the same, we update the subscription.
-                if (areEndpointsEqual(subscription, newSubscription)
-                        && !areEntityListEqual(subscription.getEntityList(), newSubscription.getEntityList())) {
-                    // Update subscription if the endpoint is the same but entities are different
-                    log.debug(" > Updating subscription with the same endpoint but different entities.");
-                    updateSubscription(subscription, newSubscription);
-                }
-                // If the endpoints are not the same, we create a new subscription.
-                else if (!areEndpointsEqual(subscription, newSubscription)) {
-                    // Create & publish Subscription (POST)
-                    createSubscription(newSubscription);
-                }
-            });
-        }
+    public Mono<Void> createSubscription(String processId, SubscriptionRequest subscriptionRequest) {
+        // Get all subscriptions from Context Broker
+        return createSubscriptionObject(processId, subscriptionRequest)
+                .flatMap(newSubscription -> getSubscriptionsFromBroker(processId)
+                        .doOnSuccess(result -> log.info(SUBSCRIPTION_RETRIEVED_MESSAGE, processId))
+                        .doOnError(e -> log.error(ERROR_RETRIEVING_SUBSCRIPTION_MESSAGE, processId, e.getMessage()))
+                        .flatMap(subscriptionList -> {
+                            if (subscriptionList.isEmpty()) {
+                                // Use Case: The subscription list is empty.
+                                log.debug("ProcessId: {}, Subscription list is empty. Creating new subscription.", processId);
+                                return postSubscription(processId, newSubscription)
+                                        .doOnSuccess(result -> log.info(SUBSCRIPTION_CREATED_MESSAGE, processId))
+                                        .doOnError(e -> log.error(ERROR_CREATING_SUBSCRIPTION_MESSAGE, processId, e.getMessage()));
+                            } else {
+                                Optional<SubscriptionDTO> subscriptionItemFound = checkIfSubscriptionExists(newSubscription, subscriptionList);
+
+                                if (subscriptionItemFound.isPresent()) {
+                                    log.debug("ProcessId: {}, Subscription Entity Found: {}", processId, subscriptionItemFound.get());
+                                    log.debug("ProcessId: {}, Subscription already exists. Checking if it needs to be updated.", processId);
+                                    SubscriptionDTO subscriptionItem = subscriptionItemFound.get();
+                                    if (checkIfSubscriptionAttributesAreEquals(subscriptionItem, newSubscription)) {
+                                        // Use Case: The subscription you are trying to create already exists in the list
+                                        // and the endpoint and  entities are the same.
+                                        log.debug("ProcessId: {}, Does not need to be created.", processId);
+                                        return Mono.empty();
+                                    } else {
+                                        // Use Case: The subscription you are trying to create already exists in the list
+                                        // but the endpoint and the entities are different.
+                                        log.debug("ProcessId: {}, Updating subscription.", processId);
+                                        return updateSubscription(processId, subscriptionItem, newSubscription)
+                                                .doOnSuccess(result -> log.info(SUBSCRIPTION_UPDATED_MESSAGE, processId))
+                                                .doOnError(e -> log.error(ERROR_UPDATING_SUBSCRIPTION_MESSAGE, processId, e.getMessage()));
+                                    }
+                                } else {
+                                    log.debug("ProcessId: {}, Subscription Entity Not Found", processId);
+                                    // Use Case: The subscription you are trying to create does not exist in the list.
+                                    log.debug("ProcessId: {}, Subscription does not exist. Creating new subscription.", processId);
+                                    return postSubscription(processId, newSubscription)
+                                            .doOnSuccess(result -> log.info(SUBSCRIPTION_CREATED_MESSAGE, processId))
+                                            .doOnError(e -> log.error(ERROR_CREATING_SUBSCRIPTION_MESSAGE, processId, e.getMessage()));
+                                }
+                            }
+                        })
+                );
+
     }
 
-    private static SubscriptionDTO createSubscriptionDTO(SubscriptionRequestDTO subscriptionRequestDTO) {
-        // Create random ID for the subscription
-        String id = SUBSCRIPTION_ID_PREFIX + UUID.randomUUID();
-        // Create SubscriptionEntityDTO list from SubscribeRequestDTO
+    private Mono<SubscriptionDTO> createSubscriptionObject(String processId, SubscriptionRequest subscriptionRequest) {
+        // Create Entity List you want to subscribe to
         List<SubscriptionEntityDTO> subscriptionEntityDTOList = new ArrayList<>();
-        subscriptionRequestDTO.getEntities().forEach(item -> subscriptionEntityDTOList.add(
+        subscriptionRequest.entities().forEach(item -> subscriptionEntityDTOList.add(
                 SubscriptionEntityDTO.builder().type(item).build()));
-        // Create SubscriptionEndpointDTO from SubscribeRequestDTO
-        SubscriptionEndpointDTO subscriptionEndpointDTO = SubscriptionEndpointDTO.builder()
-                .uri(subscriptionRequestDTO.getNotificationEndpointUri())
-                .accept("application/json")
-                .receiverInfo((List.of(new RetrievalInfoContentTypeDTO())))
-                .build();
-        // Create SubscriptionNotificationDTO from SubscriptionEndpointDTO
+        // Create Notification you want to be notified
         SubscriptionNotificationDTO subscriptionNotificationDTO = SubscriptionNotificationDTO.builder()
-                .subscriptionEndpointDTO(subscriptionEndpointDTO)
+                .subscriptionEndpointDTO(SubscriptionEndpointDTO.builder()
+                        .uri(subscriptionRequest.notificationEndpointUri())
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
+                        .receiverInfo((List.of(new RetrievalInfoContentTypeDTO())))
+                        .build())
                 .build();
-        // Create SubscriptionDTO from SubscribeRequestDTO
-        return SubscriptionDTO.builder()
-                .id(id)
-                .type(subscriptionRequestDTO.getType())
-                .entityList(subscriptionEntityDTOList)
-                .notification(subscriptionNotificationDTO)
-                .build();
+        // Return Subscription Object
+        return Mono.just(SubscriptionDTO.builder()
+                        .id(subscriptionRequest.id())
+                        .type(subscriptionRequest.type())
+                        .entityList(subscriptionEntityDTOList)
+                        .notification(subscriptionNotificationDTO)
+                        .build()
+                )
+                .doOnSuccess(result -> log.info(SUBSCRIPTION_OBJECT_CREATED_MESSAGE, processId))
+                .doOnError(e -> log.error(ERROR_CREATING_SUBSCRIPTION_OBJECT_MESSAGE, processId, e.getMessage()));
     }
 
-    private List<SubscriptionDTO> getSubscriptions() {
-        // Orion-LD URL
-        String orionLdURL = brokerProperties.internalDomain() + brokerProperties.paths().subscriptions();
-        log.debug(" > Getting Orion-LD subscriptions from: {}", orionLdURL);
-        // Get subscriptions from Orion-LD
-        String response = applicationUtils.getRequest(orionLdURL);
-        log.debug(" > Orion-LD subscriptions: {}", response);
-        // Parse subscriptions to SubscriptionDTO list
+    private Mono<List<SubscriptionDTO>> getSubscriptionsFromBroker(String processId) {
+        String brokerURL = brokerProperties.internalDomain() + brokerProperties.paths().subscriptions();
+        List<Map.Entry<String, String>> headers = List.of(new AbstractMap.SimpleEntry<>(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
+        return getRequest(processId, brokerURL, headers)
+                .flatMap(response -> {
+                    try {
+                        // Parse subscription response to Subscription list
+                        return Mono.just(objectMapper.readValue(response,
+                                objectMapper.getTypeFactory().constructCollectionType(List.class, SubscriptionDTO.class)));
+                    } catch (JsonProcessingException e) {
+                        log.error(ERROR_PARSING_SUBSCRIPTION_TO_JSON_MESSAGE, processId, e.getMessage());
+                        return Mono.error(new SubscriptionCreationException(ERROR_PARSING_SUBSCRIPTIONS_MESSAGE));
+                    }
+                });
+    }
+
+    private Mono<Void> postSubscription(String processId, SubscriptionDTO subscriptionDTO) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(response,
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, SubscriptionDTO.class));
+            String brokerURL = brokerProperties.internalDomain() + brokerProperties.paths().subscriptions();
+            List<Map.Entry<String, String>> headers = List.of(
+                    new AbstractMap.SimpleEntry<>(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            return postRequest(processId, brokerURL, headers, objectMapper.writeValueAsString(subscriptionDTO))
+                    .doOnSuccess(result -> log.info(SUBSCRIPTIONS_FETCHED_SUCCESSFULLY_MESSAGE, processId))
+                    .doOnError(e -> log.error(ERROR_FETCHING_SUBSCRIPTIONS_MESSAGE, processId, e.getMessage()));
         } catch (JsonProcessingException e) {
-            log.error("Error parsing subscriptions from Orion-LD: {}", e.getMessage());
-            throw new SubscriptionCreationException("Error parsing subscriptions from Orion-LD");
+            log.error(ERROR_PARSING_SUBSCRIPTION_TO_JSON_MESSAGE, processId, e.getMessage());
+            return Mono.error(new SubscriptionCreationException(ERROR_PARSING_SUBSCRIPTIONS_MESSAGE));
         }
     }
 
-    private boolean checkIfSubscriptionExists(SubscriptionDTO subscriptionDTO, List<SubscriptionDTO> subscriptionList) {
-        return subscriptionList.stream()
-                .anyMatch(subscription -> areSubscriptionsEqual(subscription, subscriptionDTO));
+    private Mono<Void> updateSubscription(String processId, SubscriptionDTO existingSubscription, SubscriptionDTO newSubscription) {
+        try {
+            String brokerURL = brokerProperties.internalDomain() + brokerProperties.paths().subscriptions() + "/" + existingSubscription.getId();
+            // Copy the ID from the existing subscription to the new subscription
+            newSubscription.setId(existingSubscription.getId());
+            // Headers
+            List<Map.Entry<String, String>> headers = List.of(
+                    new AbstractMap.SimpleEntry<>(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            return patchRequest(processId, brokerURL, headers, objectMapper.writeValueAsString(newSubscription))
+                    .doOnSuccess(result -> log.info(SUBSCRIPTIONS_FETCHED_SUCCESSFULLY_MESSAGE, processId))
+                    .doOnError(e -> log.error(ERROR_FETCHING_SUBSCRIPTIONS_MESSAGE, processId, e.getMessage()));
+        } catch (JsonProcessingException e) {
+            log.error(ERROR_PARSING_SUBSCRIPTION_TO_JSON_MESSAGE, processId, e.getMessage());
+            return Mono.error(new SubscriptionCreationException(ERROR_PARSING_SUBSCRIPTIONS_MESSAGE));
+        }
     }
 
-    private boolean areSubscriptionsEqual(SubscriptionDTO subscription1, SubscriptionDTO subscription2) {
-        return areEndpointsEqual(subscription1, subscription2)
-                && areEntityListEqual(subscription1.getEntityList(), subscription2.getEntityList());
+    private Optional<SubscriptionDTO> checkIfSubscriptionExists(SubscriptionDTO subscriptionDTO, List<SubscriptionDTO> subscriptionList) {
+        return subscriptionList.stream().findAny().filter(subscriptionItem -> subscriptionItem.getId().equals(subscriptionDTO.getId()));
     }
 
-    private boolean areEndpointsEqual(SubscriptionDTO subscription1, SubscriptionDTO subscription2) {
+    private boolean checkIfSubscriptionAttributesAreEquals(SubscriptionDTO subscription1, SubscriptionDTO subscription2) {
+        return checkIfBothSubscriptionsHaveTheSameEndpointAttribute(subscription1, subscription2)
+                && checkIfBothSubscriptionsHaveTheSameEntityList(subscription1.getEntityList(), subscription2.getEntityList());
+    }
+
+    private boolean checkIfBothSubscriptionsHaveTheSameEndpointAttribute(SubscriptionDTO subscription1, SubscriptionDTO subscription2) {
         return Objects.equals(subscription1.getNotification().getSubscriptionEndpointDTO().getUri(),
                 subscription2.getNotification().getSubscriptionEndpointDTO().getUri());
     }
 
-    private boolean areEntityListEqual(List<SubscriptionEntityDTO> list1, List<SubscriptionEntityDTO> list2) {
-        // First, ensure that both lists have the same size
-        if (list1.size() != list2.size()) {
+    private boolean checkIfBothSubscriptionsHaveTheSameEntityList(List<SubscriptionEntityDTO> entityList1, List<SubscriptionEntityDTO> entityList2) {
+        if (entityList1.size() != entityList2.size()) {
             return false;
+        } else {
+            Set<String> typesInList1 = entityList1.stream().map(SubscriptionEntityDTO::getType).collect(Collectors.toSet());
+            return entityList2.stream().allMatch(entity -> typesInList1.contains(entity.getType()));
         }
-        // Create a set of types from list1
-        Set<String> typesInList1 = list1.stream()
-                .map(SubscriptionEntityDTO::getType)
-                .collect(Collectors.toSet());
-        // Check if all types in list2 are present in the set of types from list1
-        return list2.stream()
-                .allMatch(entity -> typesInList1.contains(entity.getType()));
-    }
-
-
-
-    private void createSubscription(SubscriptionDTO subscriptionDTO) {
-        // Orion-LD URL
-        String orionLdURL = brokerProperties.internalDomain() + brokerProperties.paths().subscriptions();
-        log.debug(" > Posting subscription to Orion-LD: {}", orionLdURL);
-        // Parse subscription to JSON String object.
-        String requestBody;
-        try {
-            requestBody = new ObjectMapper().writeValueAsString(subscriptionDTO);
-            log.debug(" > Posting subscription to Orion-LD: {}", requestBody);
-        } catch (JsonProcessingException e) {
-            log.error("Error parsing subscription to JSON: {}", e.getMessage());
-            throw new SubscriptionCreationException("Error parsing subscription to JSON");
-        }
-        // Post subscription to Context Broker
-        applicationUtils.postRequest(orionLdURL, requestBody);
-    }
-
-    private void updateSubscription(SubscriptionDTO existingSubscription, SubscriptionDTO newSubscription) {
-        // Orion-LD URL for updating the existing subscription
-        String orionLdURL = brokerProperties.internalDomain() + brokerProperties.paths().subscriptions() + "/" + existingSubscription.getId();
-        log.debug("Updating subscription in Orion-LD: {}", orionLdURL);
-        // Copy the ID from the existing subscription to the new subscription
-        newSubscription.setId(existingSubscription.getId());
-        // Parse the new subscription (with the same ID) to JSON String object for the update
-        String requestBody;
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            requestBody = objectMapper.writeValueAsString(newSubscription);
-            log.debug("Updating subscription in Orion-LD: {}", requestBody);
-        } catch (JsonProcessingException e) {
-            log.error("Error parsing subscription to JSON: {}", e.getMessage());
-            throw new SubscriptionCreationException("Error parsing subscription to JSON");
-        }
-        // Update subscription in Context Broker
-        applicationUtils.patchRequest(orionLdURL, requestBody);
-        log.debug("Subscription updated successfully");
     }
 
 }
