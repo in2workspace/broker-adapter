@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.0-SNAPSHOT] - unreleased
 - Migrated to WebFlux and reactive programming.
 - Summarized the controllers and service classes - Entities and Subscriptions.
-- Changed endpoints to be more RESTful.
+- Changed endpoints to be more RESTFul.
 - New version on endpoints - v2.
 - Added new MessageUtils.
 - Added new specific Global Error Handler functions.
