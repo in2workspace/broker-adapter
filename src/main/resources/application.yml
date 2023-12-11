@@ -43,15 +43,28 @@ springdoc:
 server:
   port: 8080
 
+# Application Configuration
+openapi:
+  server:
+    url:
+    description:
+  info:
+    title:
+    version:
+    description:
+    termsOfService:
+    license:
+      name:
+      url:
+    contact:
+      email:
+      name:
+      url:
+
 # Context Broker Configuration
 broker:
-  externalDomain: https://<domain.org>/orion-ld
-  internalDomain: http://localhost:1026
+  externalDomain:
+  internalDomain:
   paths:
     entities:
     subscriptions:
-
-# Broker Adapter Configuration
-broker-adapter:
-  openapi:
-    url: http://localhost:8080
