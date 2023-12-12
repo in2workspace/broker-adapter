@@ -62,7 +62,7 @@ openapi:
       url:
 
 app:
-  contextEnabled: true
+  context-enabled: true
 
 # Context Broker Configuration
 broker:
