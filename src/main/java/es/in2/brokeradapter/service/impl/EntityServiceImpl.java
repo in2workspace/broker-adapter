@@ -2,6 +2,7 @@ package es.in2.brokeradapter.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.in2.brokeradapter.configuration.properties.AppProperties;
 import es.in2.brokeradapter.configuration.properties.BrokerProperties;
 import es.in2.brokeradapter.exception.JsonReadingException;
 import es.in2.brokeradapter.service.EntityService;
@@ -26,13 +27,13 @@ public class EntityServiceImpl implements EntityService {
 
     private final ObjectMapper objectMapper;
     private final BrokerProperties brokerProperties;
+    private final AppProperties appProperties;
 
     @Override
     public Mono<Void> postEntity(String processId, String requestBody) {
         String brokerURL = brokerProperties.internalDomain() + brokerProperties.paths().entities();
         log.debug(BROKER_URL_VALUE_MESSAGE, processId, brokerURL);
-        List<Map.Entry<String, String>> headers = List.of(
-                new AbstractMap.SimpleEntry<>(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_LD));
+        List<Map.Entry<String, String>> headers = getHeaders();
         return postRequest(processId, brokerURL, headers, requestBody)
                 .doOnSuccess(result -> log.info(RESOURCE_CREATED_MESSAGE, processId))
                 .doOnError(e -> log.error(ERROR_CREATING_RESOURCE_MESSAGE, e.getMessage()));
@@ -54,7 +55,7 @@ public class EntityServiceImpl implements EntityService {
                 .flatMap(entityId -> {
                     String brokerURL = brokerProperties.internalDomain() + brokerProperties.paths().entities() + "/" + entityId + "/attrs";
                     log.debug(BROKER_URL_VALUE_MESSAGE, processId, brokerURL);
-                    List<Map.Entry<String, String>> headers = List.of(new AbstractMap.SimpleEntry<>(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_LD));
+                    List<Map.Entry<String, String>> headers = getHeaders();
                     return patchRequest(processId, brokerURL, headers, requestBody);
                 })
                 .doOnSuccess(result -> log.info(RESOURCE_UPDATED_MESSAGE, processId))
@@ -80,10 +81,22 @@ public class EntityServiceImpl implements EntityService {
     public Mono<Void> deleteEntityById(String processId, String entityId) {
         String brokerURL = brokerProperties.internalDomain() + brokerProperties.paths().entities() + "/" + entityId;
         log.debug(BROKER_URL_VALUE_MESSAGE, processId, brokerURL);
-        List<Map.Entry<String, String>> headers = List.of(new AbstractMap.SimpleEntry<>(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_LD));
+        List<Map.Entry<String, String>> headers = getHeaders();
         return deleteRequest(processId, brokerURL, headers)
                 .doOnSuccess(result -> log.info(RESOURCE_DELETED_MESSAGE, processId))
                 .doOnError(e -> log.error(ERROR_DELETING_RESOURCE_MESSAGE, e.getMessage()));
+    }
+
+    private List<Map.Entry<String, String>> getHeaders() {
+        List<Map.Entry<String, String>> headers;
+        if (appProperties.contextEnabled()) {
+            headers = List.of(
+                    new AbstractMap.SimpleEntry<>(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_LD));
+        } else {
+            headers = List.of(
+                    new AbstractMap.SimpleEntry<>(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+        }
+        return headers;
     }
 
 }
