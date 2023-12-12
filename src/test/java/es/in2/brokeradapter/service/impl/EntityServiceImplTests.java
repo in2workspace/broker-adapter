@@ -3,6 +3,7 @@ package es.in2.brokeradapter.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.in2.brokeradapter.configuration.properties.AppProperties;
 import es.in2.brokeradapter.configuration.properties.BrokerPathProperties;
 import es.in2.brokeradapter.configuration.properties.BrokerProperties;
 import es.in2.brokeradapter.exception.JsonReadingException;
@@ -32,6 +33,9 @@ class EntityServiceImplTests {
 
     @Mock
     private BrokerProperties brokerProperties;
+
+    @Mock
+    private AppProperties appProperties;
 
     @InjectMocks
     private EntityServiceImpl entityService;

@@ -28,6 +28,9 @@ public class HttpUtils {
     }
 
     public static Mono<Void> postRequest(String processId, String url, List<Map.Entry<String, String>> headers, String requestBody) {
+        log.debug("ProcessId: {}, POST request to: {}", processId, url);
+        log.debug("ProcessId: {}, POST request headers: {}", processId, headers);
+        log.debug("ProcessId: {}, POST request body: {}", processId, requestBody);
         return WEB_CLIENT.post()
                 .uri(url)
                 .headers(httpHeaders -> headers.forEach(entry -> httpHeaders.add(entry.getKey(), entry.getValue())))
@@ -41,6 +44,8 @@ public class HttpUtils {
     }
 
     public static Mono<String> getRequest(String processId, String url, List<Map.Entry<String, String>> headers) {
+        log.debug("ProcessId: {}, GET request to: {}", processId, url);
+        log.debug("ProcessId: {}, GET request headers: {}", processId, headers);
         return WEB_CLIENT.get()
                 .uri(url)
                 .headers(httpHeaders -> headers.forEach(entry -> httpHeaders.add(entry.getKey(), entry.getValue())))
@@ -53,6 +58,9 @@ public class HttpUtils {
     }
 
     public static Mono<Void> patchRequest(String processId, String url, List<Map.Entry<String, String>> headers, String requestBody) {
+        log.debug("ProcessId: {}, PATCH request to: {}", processId, url);
+        log.debug("ProcessId: {}, PATCH request headers: {}", processId, headers);
+        log.debug("ProcessId: {}, PATCH request body: {}", processId, requestBody);
         return WEB_CLIENT.patch()
                 .uri(url)
                 .headers(httpHeaders -> headers.forEach(entry -> httpHeaders.add(entry.getKey(), entry.getValue())))
@@ -66,6 +74,8 @@ public class HttpUtils {
     }
 
     public static Mono<Void> deleteRequest(String processId, String url, List<Map.Entry<String, String>> headers) {
+        log.debug("ProcessId: {}, DELETE request to: {}", processId, url);
+        log.debug("ProcessId: {}, DELETE request headers: {}", processId, headers);
         return WEB_CLIENT.delete()
                 .uri(url)
                 .headers(httpHeaders -> headers.forEach(entry -> httpHeaders.add(entry.getKey(), entry.getValue())))

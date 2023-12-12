@@ -61,6 +61,9 @@ openapi:
       name:
       url:
 
+app:
+  contextEnabled: true
+
 # Context Broker Configuration
 broker:
   externalDomain:
