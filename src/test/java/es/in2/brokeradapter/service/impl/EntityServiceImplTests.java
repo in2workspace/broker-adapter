@@ -1,15 +1,13 @@
 package es.in2.brokeradapter.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.in2.brokeradapter.configuration.properties.AppProperties;
 import es.in2.brokeradapter.configuration.properties.BrokerPathProperties;
 import es.in2.brokeradapter.configuration.properties.BrokerProperties;
 import es.in2.brokeradapter.exception.JsonReadingException;
 import es.in2.brokeradapter.utils.HttpUtils;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.slf4j.SLF4JLogger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,7 +19,6 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import static es.in2.brokeradapter.utils.HttpUtils.*;
-import static es.in2.brokeradapter.utils.MessageUtils.ERROR_CREATING_RESOURCE_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -34,30 +31,33 @@ class EntityServiceImplTests {
     @Mock
     private BrokerProperties brokerProperties;
 
-    @Mock
-    private AppProperties appProperties;
 
     @InjectMocks
     private EntityServiceImpl entityService;
 
     @Test
-    void testPostEntity() {
+    void testPostEntity() throws JsonProcessingException {
+
         // Arrange
         when(brokerProperties.internalDomain()).thenReturn("https://example.com");
         when(brokerProperties.paths()).thenReturn(new BrokerPathProperties("/entities", "/subscriptions"));
+        String requestBody = "{\"requestBody\":\"example\"}";
         // Mock the postRequest method
         try (MockedStatic<HttpUtils> httpUtilsMockedStatic = Mockito.mockStatic(HttpUtils.class)) {
             when(postRequest(anyString(), anyString(), anyList(), anyString())).thenReturn(Mono.empty());
             // Act
-            Mono<Void> result = entityService.postEntity("processId", "requestBody");
+            JsonNode jsonNode = new ObjectMapper().readTree(requestBody);
+            when(objectMapper.readTree(requestBody)).thenReturn(jsonNode);
+            Mono<Void> result = entityService.postEntity("processId", requestBody);
             // Assert
             result.as(StepVerifier::create).verifyComplete();
         }
     }
 
     @Test
-    void testPostEntity_WhenErrorOccurs() {
+    void testPostEntity_WhenErrorOccurs() throws JsonProcessingException {
         // Arrange
+        String requestBody = "{\"requestBody\":\"example\"}";
         when(brokerProperties.internalDomain())
                 .thenReturn("https://example.com");
         when(brokerProperties.paths())
@@ -66,8 +66,10 @@ class EntityServiceImplTests {
         try (MockedStatic<HttpUtils> httpUtilsMockedStatic = Mockito.mockStatic(HttpUtils.class)) {
             when(postRequest(anyString(), anyString(), anyList(), anyString()))
                     .thenReturn(Mono.error(new RuntimeException("Simulated error")));
+            JsonNode jsonNode = new ObjectMapper().readTree(requestBody);
+            when(objectMapper.readTree(requestBody)).thenReturn(jsonNode);
             // Act & Assert
-            entityService.postEntity("processId", "requestBody")
+            entityService.postEntity("processId", requestBody)
                     .as(StepVerifier::create)
                     .expectError()
                     .verify();
