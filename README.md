@@ -1,4 +1,18 @@
-# Broker Adapter
+<div style="text-align: center;">
+
+<h1>Broker Adapter</h1>
+<span>by </span><a href="https://in2.es">in2.es</a>
+<p><p>
+
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=security_rating)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=ncloc)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=alert_status)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=coverage)](https://sonarcloud.io/summary/new_code?id=in2workspace_broker-adapter)
+
+</div>
 
 ## Introduction
 The Broker Adapter is one of the components used by any service that wishes to interact with Broker. It is a RESTful API that offers a wide range of endpoints for interacting with various operations supported by NGSI-LD. Additionally, it provides a subscription service that can configure subscriptions on a given server, allowing the creation of multiple subscriptions as needed.
@@ -49,7 +63,7 @@ In the docker-compose.yml file, the definition of services is structured collect
 
 ```yaml
 version: "3.8"
-services:
+#services:
   # Following components will be defined here
 ```
 
