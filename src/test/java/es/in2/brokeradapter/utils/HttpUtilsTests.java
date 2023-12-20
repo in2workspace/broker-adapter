@@ -1,13 +1,11 @@
 package es.in2.brokeradapter.utils;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 
 import static es.in2.brokeradapter.utils.HttpUtils.isNullOrBlank;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@WebFluxTest(HttpUtils.class)
 class HttpUtilsTests {
 
     @Test

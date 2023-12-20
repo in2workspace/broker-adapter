@@ -20,6 +20,10 @@ import static es.in2.brokeradapter.utils.MessageUtils.*;
 @Component
 public class HttpUtils {
 
+    private HttpUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static final WebClient WEB_CLIENT = WebClient.builder().build();
     public static final String APPLICATION_JSON_LD = "application/ld+json";
 
