@@ -1,8 +1,21 @@
-# Broker Adapter
+<div style="text-align: center;">
+
+<h1>Broker Adapter</h1>
+<span>by </span><a href="https://in2.es">in2.es</a>
+<p><p>
+
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=security_rating)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=ncloc)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=alert_status)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=coverage)](https://sonarcloud.io/summary/new_code?id=in2workspace_broker-adapter)
+
+</div>
 
 ## Introduction
 The Broker Adapter is one of the components used by any service that wishes to interact with Broker. It is a RESTful API that offers a wide range of endpoints for interacting with various operations supported by NGSI-LD. Additionally, it provides a subscription service that can configure subscriptions on a given server, allowing the creation of multiple subscriptions as needed.
-
 
 #### Technologies
 The Broker Adapter component is constructed using the following technologies:
@@ -10,11 +23,15 @@ The Broker Adapter component is constructed using the following technologies:
 - Java 17: The core programming language for building the connector.
 - Spring Boot 3.x: A framework that simplifies the development of Java-based applications, providing a robust and efficient platform.
 - Gradle: A build automation tool that manages the project's dependencies and facilitates the build process.
+- Docker: A containerization platform that allows the creation of isolated environments for the deployment of applications.
+- Prometheus: A monitoring tool that collects metrics from monitored targets by scraping metrics HTTP endpoints on these targets.
+- Documentation: A tool that generates documentation for the API endpoints. OpenAPI 3.0 and Swagger are used for this purpose.
+- WebFlux: A non-blocking reactive framework that provides a functional programming model for building asynchronous applications.
 
 ## Functionalities
 The key functionalities of the Broker Adapter include:
 
-- **Interaction with Context Broker:** The adapter provides endpoints for fetching, persisting, updating and deleting data from the Context Broker.
+- **Interaction with Context Broker:** The adapter provides endpoints for fetching, persisting, updating and deleting Entities to and from the Context Broker.
 
 - **CRUD Operations:** Users can perform various CRUD operations, such as persist (POST), update (PATCH), retrieve (GET) and delete (DELETE) entities.
   - **Create:** Users can create new entities, specifying the entity type and attributes.
@@ -25,8 +42,11 @@ The key functionalities of the Broker Adapter include:
 - **Manage subscriptions to New Entities:** Enables one or various subscriptions to new entities, allowing the user to specify the entity types to which they wish to subscribe. Also, the user can specify where they wish to receive notifications for new entities.
 
 ## Installation
+
 ### Prerequisites
 To install the blockchain connector, the following prerequisites are required:
+
+- Git
 - Docker or Docker Desktop
 
 ### Image installation / Component setup
@@ -42,60 +62,42 @@ In the docker-compose.yml file, the definition of services is structured collect
 
 ```yaml
 version: "3.8"
-services:
-# Following components will be defined here
+#services:
+  # Following components will be defined here
 ```
 
-## `mkt-broker-adapter`
+## `broker-adapter`
 - **Description:** The main, component providing simplified interactions with the Context Broker.
-- **Image:** `in2kizuna/broker-adapter:v1.0.0-SNAPSHOT`
+- **Image:** `in2kizuna/broker-adapter:v1.0.0`
 - **Ports:** `8083:8080`
-- **Volumes:** Binds `./marketplace1-config.yml` to `/src/main/resources/external-config.yml`.
-- **Links:** Connected to `mkt-context-broker`.
+- **Links:** Connected to `Context-Broker`.
 - **Networks:** Connected to `local_network`.
 
 **Docker Compose Configuration:**
 ```yaml
 mkt-broker-adapter:
-  container_name: mkt-broker-adapter
-  image: in2kizuna/broker-adapter:v1.0.0-SNAPSHOT
+  container_name: broker-adapter
+  image: in2kizuna/broker-adapter:v1.0.0
+  hostname: broker-adapter
   ports:
     - "8083:8080"
-  volumes:
-    - ./marketplace-config.yml:/src/main/resources/external-config.yml
+  environment:
+      - "BROKER_EXTERNALDOMAIN=https://example.com/scorpio/ld"
+      - "BROKER_INTERNALDOMAIN=http://scorpio:9090"
+      - "BROKER-ADAPTER_OPENAPI_URL=http://localhost:8080"
   links:
-    - mkt-context-broker
-  networks:
-    - local_network
+    - scorpio
 ```
 
 ## `mkt-context-broker`
-- **Description:** Manages context information, facilitating communication between components.
-- **Image:** `fiware/orion-ld:latest`
-- **Command:** Configured with MongoDB host and port.
-- **Ports:** `1027:1026`
-- **Links:** Connected to `mkt-mongo`.
-- **Networks:** Connected to `local_network`.
+For now, we are working with the implementation of the [Scorpio](https://github.com/ScorpioBroker/ScorpioBroker) as a Context Broker. The Scorpio is a Context Broker that implements the NGSI-LD API specification. It is a component of the FIWARE platform, developed by Red Hat, which is used to manage context information, facilitating communication between components.
 
-**Docker Compose Configuration:**
-```yaml
-mkt-context-broker:
-  container_name: mkt-context-broker
-  image: fiware/orion-ld:latest
-  restart: always
-  command: "-dbhost mkt-mongo -port 1026"
-  ports:
-    - "1027:1026"
-  links:
-    - mkt-mongo
-  networks:
-    - local_network
-```
+We are applied the following configuration to the Scorpio Context Broker: [java based all-in-one runner](https://raw.githubusercontent.com/ScorpioBroker/ScorpioBroker/development-quarkus/compose-files/docker-compose-java-aaio-kafka.yml)
 
 ## Configuration
-In addition to the `docker-compose.yml` file, it is necessary to create a configuration file that includes, at a minimum, the following fields for proper functionality. The example configuration provided aligns with the previously defined components in the Docker Compose setup.
+In addition to the `docker-compose.yml` file, it is necessary to implement the required configuration for proper functionality. You can add this configuration to the `docker-compose.yml` file or create a separate file for it. In this case, we will create a `broker-adapter-custom-config.yml` file.
 
-**Example `marketplace-config.yml`:**
+**Example `broker-adapter-custom-config.yml`:**
 
 ```yaml
 # Context Broker Configuration
@@ -107,68 +109,39 @@ This section configures the Context Broker with both external and internal domai
 
 ## Usage
 
-After implementing both the `docker-compose.yml` and configuration files, the next step is to compose the Docker services with the command:
-
-`docker-compose up -d`
+### Starting the Broker Adapter
+Run the docker-compose command to start the Broker Adapter:
+``` bash
+docker-compose up -d
+```
 
 Subsequently, within Docker, wait for all components to initialize properly. Once everything has initialized successfully (in case of any issues, double-check the endpoint addresses in the configuration file), the Broker Adapter will be ready to use.
 
-Users can utilize tools like POSTMAN for entity/subscription management, ensuring that the entity type matches the type established for subscription beforehand.
+To get a good collection of Broker Adapter operations and examples we recommend to have a look at our [test-suite](config/postman/api-test-suite.json). It is Postman based.
 
-### Broker Adapter Endpoints
+### Broker Adapter Swagger Documentation
 
-#### 1. Delete Entity
-
-- **Endpoint:** `http://<domain>/api/v1/delete/<id>` (DELETE)
-- **Description:** Deletes the entity with the specified ID.
-
-#### 2. Subscribe to Entities
-
-- **Endpoint:** `http://<domain>/api/v1/subscribe` (POST)
-- **Description:** Subscribes to specified entity types. Notifications will be redirected to the provided URI.
-- **Request Body Example:**
-  ```json
-  {
-    "id": "example_subscription_id",
-    "type": "Subscription",
-    "notification-endpoint-uri": "http://example.com/notifications",
-    "entities": ["Type1", "Type2"]
-  }
-  ```
-
-#### 3. Retrieve Entity by ID
-
-- **Endpoint:** `http://<domain>/api/v1/entities/<id>` (GET)
-- **Description:** Retrieves the entity with the specified ID.
-
-#### 4. Publish Entity
-
-- **Endpoint:** `http://<domain>/api/v1/publish` (POST)
-- **Description:** Publishes the specified entity provided in the request body.
-
-#### 5. Update Entity by ID
-
-- **Endpoint:** `http://<domain>/api/v1/update/<id>` (PATCH)
-- **Description:** Updates the entity with the specified ID, replacing it with the body provided in the request.
+The Broker Adapter provides a Swagger documentation page that can be accessed at `http://<domain>/swagger-ui.html`. This page provides a detailed description of the API endpoints, including the request and response bodies, as well as the possible responses.
 
 ## Contribution
 
 ## License
 
+You can find the license information in the [LICENSE](LICENSE) file.
 
 ## Project/Component Status
-This project is in version 1.0.0 of the MVP (Minimum Viable Product) for the Broker Adapter at 12/04/2023.
+This project is in version 1.0.0 of the MVP (Minimum Viable Product) for the Broker Adapter at 2023/12/04.
 
 ## Contact
 
-For any inquiries or further information, feel free to reach out to us:
+If you have any questions or require additional information, please don't hesitate to contact us:
 
-- **Email:** [info@in2.es](mailto:info@in2.es)
-- **Name:** IN2, Ingeniería de la Información
-- **Website:** [https://in2.es](https://in2.es)
+- IN2, Ingeniería de la Información
+- [www.in2.es](https://in2.es) 
+- [info@in2.es](mailto:info@in2.es)
 
 ## Acknowledgments
 
 
 ## Creation Date and Last Update
-This project was created on July 07, 2023, and last updated on December 4, 2023.
+This project was created on July 07, 2023, and last updated on December 20, 2023.
