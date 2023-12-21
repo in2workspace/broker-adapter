@@ -1,8 +1,21 @@
-# Broker Adapter
+<div style="text-align: center;">
+
+<h1>Broker Adapter</h1>
+<span>by </span><a href="https://in2.es">in2.es</a>
+<p><p>
+
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=security_rating)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=ncloc)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=alert_status)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=coverage)](https://sonarcloud.io/summary/new_code?id=in2workspace_broker-adapter)
+
+</div>
 
 ## Introduction
 The Broker Adapter is one of the components used by any service that wishes to interact with Broker. It is a RESTful API that offers a wide range of endpoints for interacting with various operations supported by NGSI-LD. Additionally, it provides a subscription service that can configure subscriptions on a given server, allowing the creation of multiple subscriptions as needed.
-
 
 #### Technologies
 The Broker Adapter component is constructed using the following technologies:
@@ -49,7 +62,7 @@ In the docker-compose.yml file, the definition of services is structured collect
 
 ```yaml
 version: "3.8"
-services:
+#services:
   # Following components will be defined here
 ```
 
@@ -104,7 +117,7 @@ docker-compose up -d
 
 Subsequently, within Docker, wait for all components to initialize properly. Once everything has initialized successfully (in case of any issues, double-check the endpoint addresses in the configuration file), the Broker Adapter will be ready to use.
 
-To get a good collection of Broker Adapter operations and examples we recommend to have a look at our [test-suite](tests/api-test.json). It is Postman based.
+To get a good collection of Broker Adapter operations and examples we recommend to have a look at our [test-suite](config/postman/api-test-suite.json). It is Postman based.
 
 ### Broker Adapter Swagger Documentation
 
@@ -114,7 +127,7 @@ The Broker Adapter provides a Swagger documentation page that can be accessed at
 
 ## License
 
-You can find the license information in the [LICENSE](LICENSE.md) file.
+You can find the license information in the [LICENSE](LICENSE) file.
 
 ## Project/Component Status
 This project is in version 1.0.0 of the MVP (Minimum Viable Product) for the Broker Adapter at 2023/12/04.
@@ -131,4 +144,4 @@ If you have any questions or require additional information, please don't hesita
 
 
 ## Creation Date and Last Update
-This project was created on July 07, 2023, and last updated on December 4, 2023.
+This project was created on July 07, 2023, and last updated on December 20, 2023.
