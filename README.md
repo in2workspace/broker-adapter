@@ -1,16 +1,22 @@
-<div style="text-align: center;">
+<div align="center">
 
 <h1>Broker Adapter</h1>
 <span>by </span><a href="https://in2.es">in2.es</a>
 <p><p>
 
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=security_rating)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=alert_status)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=bugs)](https://sonarcloud.io/summary/new_code?id=in2workspace_broker-adapter)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=security_rating)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=in2workspace_broker-adapter)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=ncloc)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
+
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=coverage)](https://sonarcloud.io/summary/new_code?id=in2workspace_broker-adapter)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=in2workspace_broker-adapter)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
-[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=ncloc)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=alert_status)](https://sonarcloud.io/dashboard?id=in2workspace_broker-adapter)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=coverage)](https://sonarcloud.io/summary/new_code?id=in2workspace_broker-adapter)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=in2workspace_broker-adapter&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=in2workspace_broker-adapter)
 
 </div>
 
