@@ -68,3 +68,8 @@ broker:
   paths:
     entities:
     subscriptions:
+
+# NGSI Subscription Configuration
+ngsi-subscription:
+  notificationEndpoint:
+  entityTypes:
