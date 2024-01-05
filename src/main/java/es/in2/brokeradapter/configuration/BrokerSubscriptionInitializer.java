@@ -16,7 +16,7 @@ import java.util.UUID;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class SubscriptionConfig {
+public class BrokerSubscriptionInitializer {
     private final NgsiLdSubscriptionConfigProperties subscriptionConfiguration;
     private final SubscriptionService subscriptionService;
 
@@ -34,12 +34,12 @@ public class SubscriptionConfig {
 
         log.debug("ProcessID: {} - Broker Subscription: {}", processId, brokerSubscriptionRequest.toString());
         return subscriptionService.createSubscription(processId, brokerSubscriptionRequest)
+                .doOnSuccess(response -> log.info("ProcessID: {} - Default subscription created successfully", processId))
                 .doOnError(e -> {
                     log.error("ProcessID: {} - Error creating default subscription", processId, e);
                     if (e instanceof InterruptedException) {
                         Thread.currentThread().interrupt();
                     }
-                })
-                .doOnSuccess(response -> log.info("ProcessID: {} - Default subscription created successfully", processId));
+                });
     }
 }
