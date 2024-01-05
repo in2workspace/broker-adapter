@@ -6,6 +6,7 @@ import es.in2.brokeradapter.service.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import reactor.core.publisher.Mono;
@@ -19,6 +20,7 @@ public class SubscriptionConfig {
     private final NgsiLdSubscriptionConfigProperties subscriptionConfiguration;
     private final SubscriptionService subscriptionService;
 
+    @Bean
     @EventListener(ApplicationReadyEvent.class)
     public Mono<Void> setBrokerSubscription() {
         String processId = UUID.randomUUID().toString();
