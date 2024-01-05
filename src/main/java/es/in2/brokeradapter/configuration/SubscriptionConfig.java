@@ -15,7 +15,7 @@ import java.util.UUID;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class BlockchainConnectorConfig {
+public class SubscriptionConfig {
     private final NgsiLdSubscriptionConfigProperties subscriptionConfiguration;
     private final SubscriptionService subscriptionService;
 
