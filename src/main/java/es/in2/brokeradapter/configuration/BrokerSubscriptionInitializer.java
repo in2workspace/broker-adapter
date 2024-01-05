@@ -20,7 +20,6 @@ public class BrokerSubscriptionInitializer {
     private final NgsiLdSubscriptionConfigProperties subscriptionConfiguration;
     private final SubscriptionService subscriptionService;
 
-    @Bean
     @EventListener(ApplicationReadyEvent.class)
     public Mono<Void> setBrokerSubscription() {
         String processId = UUID.randomUUID().toString();
