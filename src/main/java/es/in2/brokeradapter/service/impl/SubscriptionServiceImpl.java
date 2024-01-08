@@ -32,14 +32,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         // Get all subscriptions from Context Broker
         return createSubscriptionObject(processId, subscriptionRequest)
                 .flatMap(newSubscription -> getSubscriptionsFromBroker(processId)
-                        .doOnSuccess(result -> log.info(SUBSCRIPTION_RETRIEVED_MESSAGE, processId))
+                        .doOnSuccess(result -> log.debug(SUBSCRIPTION_RETRIEVED_MESSAGE, processId))
                         .doOnError(e -> log.error(ERROR_RETRIEVING_SUBSCRIPTION_MESSAGE, processId, e.getMessage()))
                         .flatMap(subscriptionList -> {
                             if (subscriptionList.isEmpty()) {
                                 // Use Case: The subscription list is empty.
                                 log.debug("ProcessId: {}, Subscription list is empty. Creating new subscription.", processId);
                                 return postSubscription(processId, newSubscription)
-                                        .doOnSuccess(result -> log.info(SUBSCRIPTION_CREATED_MESSAGE, processId))
+                                        .doOnSuccess(result -> log.debug(SUBSCRIPTION_CREATED_MESSAGE, processId))
                                         .doOnError(e -> log.error(ERROR_CREATING_SUBSCRIPTION_MESSAGE, processId, e.getMessage()));
                             } else {
                                 Optional<SubscriptionDTO> subscriptionItemFound = checkIfSubscriptionExists(newSubscription, subscriptionList);
@@ -58,7 +58,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                                         // but the endpoint and the entities are different.
                                         log.debug("ProcessId: {}, Updating subscription.", processId);
                                         return updateSubscription(processId, subscriptionItem, newSubscription)
-                                                .doOnSuccess(result -> log.info(SUBSCRIPTION_UPDATED_MESSAGE, processId))
+                                                .doOnSuccess(result -> log.debug(SUBSCRIPTION_UPDATED_MESSAGE, processId))
                                                 .doOnError(e -> log.error(ERROR_UPDATING_SUBSCRIPTION_MESSAGE, processId, e.getMessage()));
                                     }
                                 } else {
@@ -66,7 +66,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                                     // Use Case: The subscription you are trying to create does not exist in the list.
                                     log.debug("ProcessId: {}, Subscription does not exist. Creating new subscription.", processId);
                                     return postSubscription(processId, newSubscription)
-                                            .doOnSuccess(result -> log.info(SUBSCRIPTION_CREATED_MESSAGE, processId))
+                                            .doOnSuccess(result -> log.debug(SUBSCRIPTION_CREATED_MESSAGE, processId))
                                             .doOnError(e -> log.error(ERROR_CREATING_SUBSCRIPTION_MESSAGE, processId, e.getMessage()));
                                 }
                             }
@@ -96,7 +96,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                         .notification(subscriptionNotificationDTO)
                         .build()
                 )
-                .doOnSuccess(result -> log.info(SUBSCRIPTION_OBJECT_CREATED_MESSAGE, processId))
+                .doOnSuccess(result -> log.debug(SUBSCRIPTION_OBJECT_CREATED_MESSAGE, processId))
                 .doOnError(e -> log.error(ERROR_CREATING_SUBSCRIPTION_OBJECT_MESSAGE, processId, e.getMessage()));
     }
 
@@ -122,7 +122,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             List<Map.Entry<String, String>> headers = List.of(
                     new AbstractMap.SimpleEntry<>(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
             return postRequest(processId, brokerURL, headers, objectMapper.writeValueAsString(subscriptionDTO))
-                    .doOnSuccess(result -> log.info(SUBSCRIPTIONS_FETCHED_SUCCESSFULLY_MESSAGE, processId))
+                    .doOnSuccess(result -> log.debug(SUBSCRIPTIONS_FETCHED_SUCCESSFULLY_MESSAGE, processId))
                     .doOnError(e -> log.error(ERROR_FETCHING_SUBSCRIPTIONS_MESSAGE, processId, e.getMessage()));
         } catch (JsonProcessingException e) {
             log.error(ERROR_PARSING_SUBSCRIPTION_TO_JSON_MESSAGE, processId, e.getMessage());
@@ -139,7 +139,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             List<Map.Entry<String, String>> headers = List.of(
                     new AbstractMap.SimpleEntry<>(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
             return patchRequest(processId, brokerURL, headers, objectMapper.writeValueAsString(newSubscription))
-                    .doOnSuccess(result -> log.info(SUBSCRIPTIONS_FETCHED_SUCCESSFULLY_MESSAGE, processId))
+                    .doOnSuccess(result -> log.debug(SUBSCRIPTIONS_FETCHED_SUCCESSFULLY_MESSAGE, processId))
                     .doOnError(e -> log.error(ERROR_FETCHING_SUBSCRIPTIONS_MESSAGE, processId, e.getMessage()));
         } catch (JsonProcessingException e) {
             log.error(ERROR_PARSING_SUBSCRIPTION_TO_JSON_MESSAGE, processId, e.getMessage());

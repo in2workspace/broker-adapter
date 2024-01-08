@@ -1,12 +1,11 @@
 package es.in2.brokeradapter.configuration;
 
-import es.in2.brokeradapter.configuration.properties.NgsiLdSubscriptionConfigProperties;
+import es.in2.brokeradapter.configuration.properties.NgsiLdSubscriptionProperties;
 import es.in2.brokeradapter.domain.SubscriptionRequest;
 import es.in2.brokeradapter.service.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import reactor.core.publisher.Mono;
@@ -17,13 +16,13 @@ import java.util.UUID;
 @Configuration
 @RequiredArgsConstructor
 public class BrokerSubscriptionInitializer {
-    private final NgsiLdSubscriptionConfigProperties subscriptionConfiguration;
+    private final NgsiLdSubscriptionProperties subscriptionConfiguration;
     private final SubscriptionService subscriptionService;
 
     @EventListener(ApplicationReadyEvent.class)
     public Mono<Void> setBrokerSubscription() {
         String processId = UUID.randomUUID().toString();
-        log.info("ProcessID: {} - Setting Orion-LD Entities subscription...", processId);
+        log.info("ProcessID: {} - Setting Broker Entities subscription...", processId);
         SubscriptionRequest brokerSubscriptionRequest = SubscriptionRequest.builder()
                 .id("urn:ngsi-ld:Subscription:" + UUID.randomUUID())
                 .type("Subscription")

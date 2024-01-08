@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Optional;
 
 @ConfigurationProperties(prefix = "ngsi-subscription")
-public record NgsiLdSubscriptionConfigProperties(String notificationEndpoint, String subscriptionType, String idPrefix,
-                                                 List<String> entityTypes) {
+public record NgsiLdSubscriptionProperties(String notificationEndpoint, String subscriptionType, String idPrefix,
+                                           List<String> entityTypes) {
 
     @ConstructorBinding
-    public NgsiLdSubscriptionConfigProperties(String notificationEndpoint, String subscriptionType, String idPrefix,
-                                              List<String> entityTypes) {
+    public NgsiLdSubscriptionProperties(String notificationEndpoint, String subscriptionType, String idPrefix,
+                                        List<String> entityTypes) {
         this.notificationEndpoint = Optional.ofNullable(notificationEndpoint).orElse("http://blockchain-connector-core:8080/notifications/broker");
         this.subscriptionType = Optional.ofNullable(subscriptionType).orElse("Subscription");
         this.idPrefix = Optional.ofNullable(idPrefix).orElse("urn:ngsi-ld:Subscription:");
