@@ -1,10 +1,12 @@
 package es.in2.brokeradapter.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.in2.brokeradapter.configuration.properties.BrokerPathProperties;
 import es.in2.brokeradapter.configuration.properties.BrokerProperties;
 import es.in2.brokeradapter.domain.*;
 import es.in2.brokeradapter.utils.HttpUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,6 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
+
 class SubscriptionServiceImplTests {
 
     @Mock
@@ -34,8 +37,17 @@ class SubscriptionServiceImplTests {
     @Mock
     private BrokerProperties brokerProperties;
 
+    @Mock
+    private BrokerPathProperties brokerPathProperties;
+
     @InjectMocks
     private SubscriptionServiceImpl subscriptionService;
+
+    @BeforeEach
+    void setUp() {
+        objectMapper = new ObjectMapper();
+        subscriptionService = new SubscriptionServiceImpl(objectMapper, brokerProperties);
+    }
 
     private SubscriptionRequest subscriptionRequest = SubscriptionRequest.builder()
             .id("1234")
@@ -71,84 +83,117 @@ class SubscriptionServiceImplTests {
                 .entities(List.of("ProductOffering"))
                 .notificationEndpointUri("https://example.com")
                 .build();
-        when(brokerProperties.internalDomain()).thenReturn("https://example.com");
-        when(brokerProperties.paths()).thenReturn(new BrokerPathProperties("/entities", "/subscriptions"));
         // Mock the postRequest method
         try (MockedStatic<HttpUtils> httpUtilsMockedStatic = Mockito.mockStatic(HttpUtils.class)) {
 
-            // Mock the createSubscriptionObject method
-            // todo: mock the createSubscriptionObject method
-//            when(subscriptionService.createSubscriptionObject("processId", subscriptionRequest))
-//                    .thenReturn(Mono.just(new SubscriptionDTO()));
 
-            when(postRequest(anyString(), anyString(), anyList(), anyString())).thenReturn(Mono.empty());
-            when(patchRequest(anyString(), anyString(), anyList(), anyString())).thenReturn(Mono.empty());
-            // Act
+            // Mock the broker properties and the HTTP request
+            when(brokerProperties.internalDomain()).thenReturn("http://example.com");
+            when(brokerProperties.paths()).thenReturn(new BrokerPathProperties("/entities", "/subscriptions"));
+            when(HttpUtils.getRequest(anyString(), anyString(), anyList())).thenReturn(Mono.just("[]")); // Empty list of subscriptions
+            when(HttpUtils.postRequest(anyString(), anyString(), anyList(), anyString())).thenReturn(Mono.empty());
             Mono<Void> result = subscriptionService.createSubscription("processId", subscriptionRequest);
             // Assert
-            result.as(StepVerifier::create).expectComplete();
+            result.as(StepVerifier::create).verifyComplete();
+
         }
-    }
-
-
-    // todo: add test for every use case within the createSubscription method
-    private Method createSubscriptionObject() throws NoSuchMethodException {
-        Method method = SubscriptionServiceImpl.class
-                .getDeclaredMethod("createSubscriptionObject", String.class, SubscriptionRequest.class);
-        method.setAccessible(true);
-        return method;
-    }
-
-    private Method getSubscriptionsFromBroker() throws NoSuchMethodException {
-        Method method = SubscriptionServiceImpl.class
-                .getDeclaredMethod("getSubscriptionsFromBroker", String.class);
-        method.setAccessible(true);
-        return method;
-    }
-
-    private Method postSubscription() throws NoSuchMethodException {
-        Method method = SubscriptionServiceImpl.class
-                .getDeclaredMethod("postSubscription", String.class, SubscriptionDTO.class);
-        method.setAccessible(true);
-        return method;
-    }
-
-    private Method updateSubscription() throws NoSuchMethodException {
-        Method method = SubscriptionServiceImpl.class
-                .getDeclaredMethod("updateSubscription", String.class, SubscriptionDTO.class, SubscriptionDTO.class);
-        method.setAccessible(true);
-        return method;
-    }
-
-    private Method checkIfSubscriptionExists() throws NoSuchMethodException {
-        Method method = SubscriptionServiceImpl.class
-                .getDeclaredMethod("checkIfSubscriptionExists", SubscriptionDTO.class, List.class);
-        method.setAccessible(true);
-        return method;
-    }
-
-    private Method checkIfSubscriptionAttributesAreEquals() throws NoSuchMethodException {
-        Method method = SubscriptionServiceImpl.class
-                .getDeclaredMethod("checkIfSubscriptionAttributesAreEquals", SubscriptionDTO.class, SubscriptionDTO.class);
-        method.setAccessible(true);
-        return method;
-    }
-
-    private Method checkIfBothSubscriptionsHaveTheSameEndpointAttribute() throws NoSuchMethodException {
-        Method method = SubscriptionServiceImpl.class
-                .getDeclaredMethod("checkIfBothSubscriptionsHaveTheSameEndpointAttribute", SubscriptionDTO.class, SubscriptionDTO.class);
-        method.setAccessible(true);
-        return method;
 
     }
 
-    private Method checkIfBothSubscriptionsHaveTheSameEntityList() throws NoSuchMethodException {
-        Method method = SubscriptionServiceImpl.class
-                .getDeclaredMethod("checkIfBothSubscriptionsHaveTheSameEntityList", List.class, List.class);
-        method.setAccessible(true);
-        return method;
+    @Test
+    void testUpdateSubscription() {
+        // Arrange
+        SubscriptionRequest subscriptionRequest = SubscriptionRequest.builder()
+                .id("1234")
+                .type("Subscription")
+                .entities(List.of("ProductOffering"))
+                .notificationEndpointUri("https://example.com")
+                .build();
+
+        String getResponse = "[ {\n" +
+                "  \"id\" : \"1234\",\n" +
+                "  \"type\" : \"Subscription\",\n" +
+                "  \"entities\" : [ {\n" +
+                "    \"type\" : \"ProductOffering\"\n" +
+                "  }, {\n" +
+                "    \"type\" : \"ProductOrder\"\n" +
+                "  } ],\n" +
+                "  \"notification\" : {\n" +
+                "    \"endpoint\" : {\n" +
+                "      \"accept\" : \"application/json\",\n" +
+                "      \"receiverInfo\" : [ {\n" +
+                "        \"Content-Type\" : \"application/json\"\n" +
+                "      } ],\n" +
+                "      \"uri\" : \"https://example.com\"\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"timesFailed\" : 0,\n" +
+                "  \"timesSent\" : 0\n" +
+                "} ]";
+
+        // Mock the postRequest method
+        try (MockedStatic<HttpUtils> httpUtilsMockedStatic = Mockito.mockStatic(HttpUtils.class)) {
+
+
+            // Mock the broker properties and the HTTP request
+            when(brokerProperties.internalDomain()).thenReturn("http://example.com");
+            when(brokerProperties.paths()).thenReturn(new BrokerPathProperties("/entities", "/subscriptions"));
+            when(HttpUtils.getRequest(anyString(), anyString(), anyList())).thenReturn(Mono.just(getResponse)); // List of subscriptions
+            when(HttpUtils.patchRequest(anyString(), anyString(), anyList(), anyString())).thenReturn(Mono.empty());
+            Mono<Void> result = subscriptionService.createSubscription("processId", subscriptionRequest);
+            // Assert
+            result.as(StepVerifier::create).verifyComplete();
+
+        }
+
 
     }
 
+    @Test
+    void testUpdateSubscription_sameSubscriptions() {
+        // Arrange
+        SubscriptionRequest subscriptionRequest = SubscriptionRequest.builder()
+                .id("1234")
+                .type("Subscription")
+                .entities(List.of("ProductOffering"))
+                .notificationEndpointUri("https://example.com")
+                .build();
+
+        String getResponse = "[ {\n" +
+                "  \"id\" : \"1234\",\n" +
+                "  \"type\" : \"Subscription\",\n" +
+                "  \"entities\" : [ {\n" +
+                "    \"type\" : \"ProductOffering\"\n" +
+                "  }],\n" +
+                "  \"notification\" : {\n" +
+                "    \"endpoint\" : {\n" +
+                "      \"accept\" : \"application/json\",\n" +
+                "      \"receiverInfo\" : [ {\n" +
+                "        \"Content-Type\" : \"application/json\"\n" +
+                "      } ],\n" +
+                "      \"uri\" : \"https://example.com\"\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"timesFailed\" : 0,\n" +
+                "  \"timesSent\" : 0\n" +
+                "} ]";
+
+        // Mock the postRequest method
+        try (MockedStatic<HttpUtils> httpUtilsMockedStatic = Mockito.mockStatic(HttpUtils.class)) {
+
+
+            // Mock the broker properties and the HTTP request
+            when(brokerProperties.internalDomain()).thenReturn("http://example.com");
+            when(brokerProperties.paths()).thenReturn(new BrokerPathProperties("/entities", "/subscriptions"));
+            when(HttpUtils.getRequest(anyString(), anyString(), anyList())).thenReturn(Mono.just(getResponse)); // List of subscriptions
+            when(HttpUtils.patchRequest(anyString(), anyString(), anyList(), anyString())).thenReturn(Mono.empty());
+            Mono<Void> result = subscriptionService.createSubscription("processId", subscriptionRequest);
+            // Assert
+            result.as(StepVerifier::create).verifyComplete();
+
+        }
+
+
+    }
 }
 
